@@ -1,0 +1,11 @@
+<!--  NAVBAR  -->
+<app-navbar></app-navbar>
+<!--  END NAVBAR  -->
+
+<div *ngIf="cart | async as cartData; else loading">
+  <div *ngFor="let item of cartData">
+    Book {{ item.bookId }} - Quantity {{ item.quantity }}
+  </div>
+</div>
+
+<ng-template #loading>Loading…</ng-template>

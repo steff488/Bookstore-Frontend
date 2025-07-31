@@ -1,0 +1,9 @@
+<!--  NAVBAR  -->
+<app-navbar></app-navbar>
+<!--  END NAVBAR  -->
+
+<div *ngIf="favorites | async as favoriteData; else loading">
+  <div *ngFor="let item of favoriteData">Book {{ item.bookId }}</div>
+</div>
+
+<ng-template #loading>Loading…</ng-template>

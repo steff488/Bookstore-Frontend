@@ -1,0 +1,180 @@
+<!--  NAVBAR  -->
+<app-navbar></app-navbar>
+<!--  END NAVBAR  -->
+
+<!--  BOOKS BACK  -->
+<div
+  style="
+    height: calc(100svh - var(--navbar-height));
+    top: var(--navbar-height);
+    background-image: url(./assets/books32.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+  "
+></div>
+<!--  END BOOKS BACK -->
+
+<!--  QUOTE -->
+<div
+  style="
+    position: absolute;
+    height: calc(100svh - var(--navbar-height));
+    width: 60%;
+    top: var(--navbar-height);
+    right: 0;
+    padding: 8%;
+    padding-top: 15%;
+    background: #30220c;
+    background: radial-gradient(
+      circle at bottom,
+      #30220c 15%,
+      #27190b 40%,
+      #191207 90%
+    );
+    z-index: 1;
+  "
+>
+  <div style="text-align: right; max-width: 800px">
+    <p
+      style="
+        color: var(--primary-color);
+        font-family: 'Libre Baskerville', serif;
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+        line-height: 1.3;
+        font-style: italic;
+      "
+    >
+      "A room without books is like a body without a soul."
+    </p>
+    <p
+      style="
+        color: var(--primary-color);
+        font-family: 'Libre Baskerville', serif;
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 400;
+      "
+    >
+      - Marcus Tullius Cicero
+    </p>
+  </div>
+</div>
+<!--  END QUOTE -->
+
+<!--  BOOKS FRONT -->
+<div
+  style="
+    position: absolute;
+    height: calc(100svh - var(--navbar-height));
+    width: 100%;
+    top: var(--navbar-height);
+    background-image: url(./assets/books-front.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+  "
+></div>
+<!--  END BOOKS FRONT -->
+
+<!--  TOOLBAR -->
+<div
+  style="
+    position: sticky;
+    padding-left: 16px;
+    padding-right: 16px;
+    height: var(--toolbar-height);
+    top: var(--navbar-height);
+    z-index: 2;
+    background-color: var(--light-color);
+  "
+>
+  <button matButton (click)="sidenav.toggle()">Filters</button>
+  <!--  CATEGORIES -->
+  <mat-chip
+    *ngFor="let category of categories | async"
+    style="margin-right: 5px"
+  >
+    {{category.name | titlecase}}
+  </mat-chip>
+  <!--  END CATEGORIES -->
+</div>
+<!--  END TOOLBAR  -->
+
+<mat-sidenav-container>
+  <!--  SIDEBAR -->
+  <mat-sidenav
+    #sidenav
+    mode="over"
+    [(opened)]="sideNavOpened"
+    [autoFocus]="false"
+    [fixedInViewport]="true"
+    fixedTopGap="104"
+    style="border-radius: 0"
+  >
+    <p>Filters here</p>
+  </mat-sidenav>
+  <!-- END SIDEBAR  -->
+
+  <!-- CONTENT  -->
+  <mat-sidenav-content>
+    <!--  CAROUSEL  -->
+
+    <!--  END CAROUSEL  -->
+
+    <ng-container *ngIf="books | async as books; else loading">
+      <div
+        class="d-grid p-3"
+        style="
+          grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+          gap: 1rem;
+        "
+      >
+        <mat-card
+          *ngFor="let book of books"
+          class="cursor-pointer shadow-sm border rounded h-100"
+          style="width: 100%; height: 420px"
+        >
+          <mat-card-header
+            class="p-0 border-0"
+            [routerLink]="['/books', book.id]"
+          >
+            <img
+              mat-card-image
+              role="button"
+              src="assets/book.png"
+              alt="{{ book.title }} cover"
+              class="w-100 d-block mx-auto"
+              style="height: 160px; object-fit: cover"
+            />
+          </mat-card-header>
+
+          <mat-card-content class="p-2">
+            <h5 class="fw-semibold fs-6 mb-1 text-truncate">
+              {{ book.title }}
+            </h5>
+            <p class="small mb-1 text-truncate">Author: {{ book.authorId }}</p>
+
+            <p class="small mb-1">Category: {{ book.categoryId }}</p>
+            <p class="small mb-1">Price: {{ book.price }} lei</p>
+            <p class="small mb-1">Stock: {{ book.stock }}</p>
+            <p class="small mb-1">Rating: {{ book.rating }}</p>
+            <p class="small mb-0">Published: {{ book.publicationDate }}</p>
+            <button (click)="toggleFavorite(book.id)">
+              {{ getFavoriteButtonText(book.id) }}
+            </button>
+            <button (click)="addToCart(book.id)">Add to cart</button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </ng-container>
+
+    <ng-template #loading>
+      <p class="p-4 text-center text-muted">Loading books...</p>
+    </ng-template>
+  </mat-sidenav-content>
+  <!--  END CONTENT  -->
+</mat-sidenav-container>

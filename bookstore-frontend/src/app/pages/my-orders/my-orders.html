@@ -1,0 +1,24 @@
+<!--  NAVBAR  -->
+<app-navbar></app-navbar>
+<!--  END NAVBAR  -->
+
+<div *ngIf="orders | async as orderList; else loading">
+  <h2>My Orders</h2>
+  <div *ngFor="let order of orderList" class="order-card">
+    <h3>Order id #{{ order.id }}</h3>
+    <p>Status: {{ order.status }}</p>
+    <p>Total: {{ order.totalPrice | currency }}</p>
+    <p>Created: {{ order.createdAt }}</p>
+
+    <ul>
+      <li *ngFor="let item of order.items">
+        Product: {{ item.id }}, Quantity: {{ item.quantity }}, Subtotal: {{
+        item.priceAtPurchase }} lei
+      </li>
+    </ul>
+  </div>
+</div>
+
+<ng-template #loading>
+  <p>Loading orders...</p>
+</ng-template>

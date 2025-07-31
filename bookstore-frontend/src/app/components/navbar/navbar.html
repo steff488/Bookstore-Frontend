@@ -1,0 +1,75 @@
+<mat-toolbar
+  class="px-3"
+  style="
+    position: sticky;
+    height: var(--navbar-height);
+    top: 0;
+    z-index: 5;
+    background: var(--secondary-color);
+  "
+>
+  <div style="display: flex; flex-direction: row; align-items: center">
+    <div
+      style="
+        height: 35px;
+        width: 35px;
+        background-image: url(./assets/logo3.png);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        margin-right: 10px;
+      "
+    ></div>
+    <div
+      [routerLink]="['/']"
+      style="color: var(--primary-color); font-size: 2rem; cursor: pointer"
+    >
+      The Cozy Corner
+    </div>
+  </div>
+
+  <span class="flex-grow-1"></span>
+
+  <!--  SEARCH BOX  -->
+  <div class="d-flex align-items-center position-relative">
+    <form class="search-form" [class.active]="searchQuery.length > 0" action="">
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search..."
+        [(ngModel)]="searchQuery"
+        name="search"
+      />
+      <div class="search-icon-container">
+        <mat-icon class="search-icon">search</mat-icon>
+      </div>
+    </form>
+  </div>
+  <!--  END SEARCH BOX  -->
+
+  <mat-divider class="mx-3" vertical style="height: 40%"></mat-divider>
+
+  <button mat-icon-button aria-label="Favorite" [routerLink]="['/favorites']">
+    <mat-icon style="color: var(--primary-color)">favorite</mat-icon>
+  </button>
+
+  <button mat-icon-button aria-label="Cart" [routerLink]="['/cart']">
+    <mat-icon style="color: var(--primary-color)">shopping_cart</mat-icon>
+  </button>
+
+  <mat-divider class="mx-3" vertical style="height: 40%"></mat-divider>
+
+  <button [matMenuTriggerFor]="menu" mat-icon-button aria-label="User">
+    <mat-icon style="color: var(--primary-color)">person</mat-icon>
+  </button>
+
+  <mat-menu
+    #menu="matMenu"
+    class="custom-menu"
+    style="background-color: var(--secondary-color)"
+  >
+    <button mat-menu-item [routerLink]="['/my-account']">Account</button>
+    <button mat-menu-item [routerLink]="['/my-orders']">My Orders</button>
+    <button mat-menu-item [routerLink]="['/settings']">Settings</button>
+  </mat-menu>
+</mat-toolbar>

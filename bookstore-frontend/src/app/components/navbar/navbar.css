@@ -1,0 +1,108 @@
+.search-form {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 0%);
+  transition: all 0.8s;
+  width: 40px;
+  height: 40px;
+  background: var(--light-color);
+  box-sizing: border-box;
+  border-radius: 25px;
+  border: 1px solid var(--light-color);
+}
+
+.search-input {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 38px;
+  padding-left: 10px;
+  padding-right: 0px;
+  outline: 0;
+  border: 0;
+  display: none;
+  font-size: 0.8em;
+  border-radius: 20px;
+  background: var(--light-color);
+  transition: all 0.8s;
+}
+
+.search-icon-container {
+  box-sizing: border-box;
+  width: 36.5px;
+  height: 36.5px;
+  position: absolute;
+  top: 1px;
+  right: 0.5px;
+  border-radius: 50%;
+  background: var(--light-color);
+  color: var(--secondary-color);
+  text-align: center;
+  transition: all 0.78s;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.search-form:hover {
+  width: 300px;
+  cursor: pointer;
+}
+
+.search-form.active {
+  width: 300px;
+  cursor: pointer;
+}
+
+.search-form:hover .search-input {
+  display: block;
+}
+
+.search-form.active .search-input {
+  display: block;
+}
+
+.search-form:hover .search-icon-container {
+  background: var(--secondary-color);
+  color: var(--light-color);
+}
+
+.search-form.active .search-icon-container {
+  background: var(--secondary-color);
+  color: var(--light-color);
+}
+
+.search-input:hover {
+  display: block;
+  padding-right: 45px;
+}
+
+::ng-deep .custom-menu {
+  background-color: var(--light-color) !important;
+}
+
+::ng-deep .mat-mdc-menu-content {
+  padding: 0 !important;
+}
+
+::ng-deep .mat-mdc-menu-item:hover {
+  background-color: #e0d9cd !important;
+}
+
+::ng-deep .mat-mdc-icon-button:hover {
+  background-color: rgba(210, 177, 134, 0.15) !important;
+}
+
+::ng-deep mat-sidenav {
+  z-index: 5 !important;
+}
+
+::ng-deep .mdc-evolution-chip__action {
+  cursor: pointer !important;
+}
