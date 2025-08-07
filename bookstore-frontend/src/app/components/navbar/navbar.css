@@ -6,10 +6,10 @@
   transition: all 0.8s;
   width: 40px;
   height: 40px;
-  background: var(--light-color);
+  background: var(--primary-color);
   box-sizing: border-box;
   border-radius: 25px;
-  border: 1px solid var(--light-color);
+  border: 1px solid var(--primary-color);
 }
 
 .search-input {
@@ -25,7 +25,7 @@
   display: none;
   font-size: 0.8em;
   border-radius: 20px;
-  background: var(--light-color);
+  background: var(--primary-color);
   transition: all 0.8s;
 }
 
@@ -37,7 +37,7 @@
   top: 1px;
   right: 0.5px;
   border-radius: 50%;
-  background: var(--light-color);
+  background: var(--primary-color);
   color: var(--secondary-color);
   text-align: center;
   transition: all 0.78s;
@@ -70,12 +70,12 @@
 
 .search-form:hover .search-icon-container {
   background: var(--secondary-color);
-  color: var(--light-color);
+  color: var(--primary-color);
 }
 
 .search-form.active .search-icon-container {
   background: var(--secondary-color);
-  color: var(--light-color);
+  color: var(--primary-color);
 }
 
 .search-input:hover {
@@ -84,7 +84,7 @@
 }
 
 ::ng-deep .custom-menu {
-  background-color: var(--light-color) !important;
+  background-color: var(--primary-color) !important;
 }
 
 ::ng-deep .mat-mdc-menu-content {

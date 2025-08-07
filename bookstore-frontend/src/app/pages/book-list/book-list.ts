@@ -23,6 +23,8 @@ import { Navbar } from '../../components/navbar/navbar';
   imports: [CommonModule, RouterModule, MaterialModule, FormsModule, Navbar],
 })
 export class BookList {
+  userId!: number;
+
   books!: Observable<Book[]>;
   categories!: Observable<Category[]>;
 
@@ -48,25 +50,26 @@ export class BookList {
 
   // Repeat books as there aren't enougn in the database to require scrolling
   ngOnInit(): void {
-    this.books = this.bookService.getBooks().pipe(
-      map((books) => {
-        let repeatedBooks: Book[] = [];
-        for (let i = 0; i < 10; i++) {
-          repeatedBooks = repeatedBooks.concat(books);
-        }
-        return repeatedBooks;
-      })
-    );
+    // const urserIdStr = localStorage.getItem('userId');
+    const userIdStr = 1;
+    if (!userIdStr) {
+      console.error('book-list: UserId not found in localStorage');
+      return;
+    }
+
+    this.userId = Number(userIdStr);
+
+    this.books = this.bookService.getBooks();
     this.categories = this.categoryService.getCategories();
 
-    this.favoriteItemService.getFavoriteItems().subscribe({
+    this.favoriteItemService.getAllByUserId(this.userId).subscribe({
       next: (items) => {
         this.favoriteItems = items;
       },
       error: (err) => console.error('Failed to load favorites:', err),
     });
 
-    this.cartItemService.getCartItems().subscribe({
+    this.cartItemService.getAllByUserId(this.userId).subscribe({
       next: (items) => {
         this.cartItems = items;
       },
@@ -74,6 +77,8 @@ export class BookList {
     });
   }
 
+  // Checks is a book is a favorite for a certain userId
+  // (favoriteItems contain only books related to the passed userId)
   isBookFavorite(bookId: number): boolean {
     return this.favoriteItems.some((item) => item.bookId === bookId);
   }
@@ -103,7 +108,7 @@ export class BookList {
   private addToFavorites(bookId: number): void {
     const favoriteItem: FavoriteItem = {
       bookId: bookId,
-      userId: 1,
+      userId: this.userId,
     };
 
     this.favoriteItemService.createFavoriteItem(favoriteItem).subscribe({
@@ -117,7 +122,7 @@ export class BookList {
 
   private removeFromFavorites(bookId: number): void {
     const favoriteItem = this.favoriteItems.find(
-      (item) => item.bookId === bookId && item.userId === 1
+      (item) => item.bookId === bookId && item.userId === this.userId
     );
 
     if (!favoriteItem?.id) return;
@@ -136,7 +141,7 @@ export class BookList {
   addToCart(bookId: number): void {
     // Check if item already exists in cart
     const existingCartItem = this.cartItems.find(
-      (item) => item.bookId === bookId && item.userId === 1
+      (item) => item.bookId === bookId
     );
 
     if (existingCartItem) {
@@ -154,7 +159,7 @@ export class BookList {
   private createNewCartItem(bookId: number): void {
     const cartItem: CartItem = {
       bookId: bookId,
-      userId: 1,
+      userId: this.userId,
       quantity: 1,
     };
 
@@ -185,24 +190,6 @@ export class BookList {
         console.log(`Cart quantity updated to ${newQuantity}`);
       },
       error: (err) => console.error('Failed to update cart quantity:', err),
-    });
-  }
-
-  private removeFromCart(bookId: number): void {
-    const cartItem = this.cartItems.find(
-      (item) => item.bookId === bookId && item.userId === 1
-    );
-
-    if (!cartItem?.id) return;
-
-    this.cartItemService.deleteCartItem(cartItem.id).subscribe({
-      next: () => {
-        this.cartItems = this.cartItems.filter(
-          (item) => item.id !== cartItem.id
-        );
-        console.log('Removed from cart');
-      },
-      error: (err) => console.error('Failed to remove from cart:', err),
     });
   }
 }

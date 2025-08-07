@@ -2,13 +2,15 @@
 <app-navbar></app-navbar>
 <!--  END NAVBAR  -->
 
-<div *ngIf="user | async as userData; else loading">
+@if (user | async; as user) {
+<div>
   <h2>My Account</h2>
-  <p>{{userData.userName}}</p>
-  <p>{{userData.email}}</p>
+  <p>{{user.userName}}</p>
+  <p>{{user.email}}</p>
   <button>change passwod</button>
 </div>
-
+} @else {
 <ng-template #loading>
   <p>Loading orders...</p>
 </ng-template>
+}

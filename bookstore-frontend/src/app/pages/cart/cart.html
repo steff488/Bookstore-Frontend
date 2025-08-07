@@ -2,10 +2,25 @@
 <app-navbar></app-navbar>
 <!--  END NAVBAR  -->
 
-<div *ngIf="cart | async as cartData; else loading">
-  <div *ngFor="let item of cartData">
-    Book {{ item.bookId }} - Quantity {{ item.quantity }}
-  </div>
-</div>
+@if (cartItems) {
+<div>
+  @for (cartItem of cartItems; track cartItem.id) { @for (book of books; track
+  book.id) { @if(book.id === cartItem.bookId) {
 
+  <div>
+    {{ book.title }} - {{ getAuthorNameForBook(book.id) }} - Quantity {{
+    cartItem.quantity }}
+  </div>
+  <button (click)="removeFromCart(cartItem.id!)">Remove from cart</button>
+  <button (click)="decrementCartItemQuantity(cartItem.id!)">
+    Decrement quantity
+  </button>
+  <button (click)="incrementCartItemQuantity(cartItem.id!)">
+    Increment quantity
+  </button>
+  } } }
+  <div>Total: ${{ total | number:'1.2-2' }} lei</div>
+</div>
+} @else {
 <ng-template #loading>Loading…</ng-template>
+}

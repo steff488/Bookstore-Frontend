@@ -22,7 +22,7 @@
     ></div>
     <div
       [routerLink]="['/']"
-      style="color: var(--primary-color); font-size: 2rem; cursor: pointer"
+      style="color: var(--accent-color); font-size: 2rem; cursor: pointer"
     >
       The Cozy Corner
     </div>
@@ -50,17 +50,17 @@
   <mat-divider class="mx-3" vertical style="height: 40%"></mat-divider>
 
   <button mat-icon-button aria-label="Favorite" [routerLink]="['/favorites']">
-    <mat-icon style="color: var(--primary-color)">favorite</mat-icon>
+    <mat-icon style="color: var(--accent-color)">favorite</mat-icon>
   </button>
 
   <button mat-icon-button aria-label="Cart" [routerLink]="['/cart']">
-    <mat-icon style="color: var(--primary-color)">shopping_cart</mat-icon>
+    <mat-icon style="color: var(--accent-color)">shopping_cart</mat-icon>
   </button>
 
   <mat-divider class="mx-3" vertical style="height: 40%"></mat-divider>
 
   <button [matMenuTriggerFor]="menu" mat-icon-button aria-label="User">
-    <mat-icon style="color: var(--primary-color)">person</mat-icon>
+    <mat-icon style="color: var(--accent-color)">person</mat-icon>
   </button>
 
   <mat-menu

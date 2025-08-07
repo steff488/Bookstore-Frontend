@@ -4,9 +4,9 @@
   --navbar-height: 64px;
   --toolbar-height: 40px;
 
-  --primary-color: #d2b186;
+  --accent-color: #d2b186;
   --secondary-color: #191207;
-  --light-color: #f0e9de;
+  --primary-color: #f0e9de;
 }
 
 body {

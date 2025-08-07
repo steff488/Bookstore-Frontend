@@ -2,7 +2,8 @@
 <app-navbar></app-navbar>
 <!--  END NAVBAR  -->
 
-<div *ngIf="book">
+@if (book) {
+<div>
   <img
     [src]="book.coverImageUrl"
     alt="{{ book.title }}"
@@ -22,3 +23,4 @@
   </button>
   <button (click)="addToCart(book.id)">Add to cart</button>
 </div>
+}

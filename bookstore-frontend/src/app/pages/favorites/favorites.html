@@ -2,8 +2,18 @@
 <app-navbar></app-navbar>
 <!--  END NAVBAR  -->
 
-<div *ngIf="favorites | async as favoriteData; else loading">
-  <div *ngFor="let item of favoriteData">Book {{ item.bookId }}</div>
+@if (favoriteItems) {
+<div>
+  @for (favorite of favoriteItems; track favorite.id) {
+  <div>
+    Book {{ favorite.bookId }}
+    <button (click)="removeFromFavorites(favorite.bookId)">
+      Remove from favorites
+    </button>
+    <button (click)="addToCart(favorite.bookId)">Add to cart</button>
+  </div>
+  }
 </div>
-
+} @else {
 <ng-template #loading>Loading…</ng-template>
+}
