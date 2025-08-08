@@ -49,7 +49,9 @@ export class Cart implements OnInit {
                 .subscribe({
                   next: (author) => {
                     this.authors.push(author);
-                    this.computeTotal(); // Recalculate total after each book is loaded
+                    // Recompute total after each book is loaded
+                    // (this is neccessary because of the async)
+                    this.computeTotal();
                   },
                   error: (err) => console.error('Failed to fetch author:', err),
                 });
@@ -75,10 +77,8 @@ export class Cart implements OnInit {
       }
     });
 
-    // Round to exactly 2 decimal places
+    // Round to 2 decimal places
     this.total = Math.round(this.total * 100) / 100;
-
-    console.log('Total recalculated:', this.total);
   }
 
   // Helper method to format total for display

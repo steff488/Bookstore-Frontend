@@ -20,6 +20,7 @@
   </button>
   } } }
   <div>Total: ${{ total | number:'1.2-2' }} lei</div>
+  <button [routerLink]="['/checkout']">Go to checkout</button>
 </div>
 } @else {
 <ng-template #loading>Loading…</ng-template>
