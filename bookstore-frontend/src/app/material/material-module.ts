@@ -15,6 +15,7 @@ import { MatChipGrid, MatChipRow } from '@angular/material/chips';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
 import { MatChip, MatChipSet } from '@angular/material/chips';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 const MaterialComponents = [MatButtonModule];
 
@@ -40,6 +41,7 @@ const MaterialComponents = [MatButtonModule];
     MatMiniFabButton,
     MatChip,
     MatChipSet,
+    MatPaginatorModule,
   ],
   exports: [
     MaterialComponents,
@@ -62,6 +64,7 @@ const MaterialComponents = [MatButtonModule];
     MatMiniFabButton,
     MatChip,
     MatChipSet,
+    MatPaginatorModule,
   ],
 })
 export class MaterialModule {}

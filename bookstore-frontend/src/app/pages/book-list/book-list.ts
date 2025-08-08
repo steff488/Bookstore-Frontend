@@ -7,26 +7,39 @@ import { FavoriteItemService } from '../../services/favoriteItem-service/favorit
 import { FavoriteItem } from '../../models/favoriteItem';
 import { CartItemService } from '../../services/cartItem-service/cartItem.service';
 import { CartItem } from '../../models/cartItem';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from '../../material/material-module';
-import { map } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../components/navbar/navbar';
+import { Sidebar } from '../../components/sidebar/sidebar';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-book-list',
   templateUrl: './book-list.html',
   styleUrl: './book-list.css',
   standalone: true,
-  imports: [CommonModule, RouterModule, MaterialModule, FormsModule, Navbar],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MaterialModule,
+    FormsModule,
+    Navbar,
+    Sidebar,
+  ],
 })
 export class BookList {
   userId!: number;
 
   books!: Observable<Book[]>;
   categories!: Observable<Category[]>;
+
+  allBooks: Book[] = [];
+  numberOfBooks = 0;
+  pageSize = 25;
+  currentPage = 0;
 
   favoriteItems: FavoriteItem[] = [];
   cartItems: CartItem[] = [];
@@ -62,6 +75,12 @@ export class BookList {
     this.books = this.bookService.getBooks();
     this.categories = this.categoryService.getCategories();
 
+    this.bookService.getBooks().subscribe((books) => {
+      this.allBooks = books;
+      this.numberOfBooks = books.length;
+      this.updatePagedBooks();
+    });
+
     this.favoriteItemService.getAllByUserId(this.userId).subscribe({
       next: (items) => {
         this.favoriteItems = items;
@@ -75,6 +94,19 @@ export class BookList {
       },
       error: (err) => console.error('Failed to load cart items:', err),
     });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageSize = event.pageSize;
+    this.currentPage = event.pageIndex;
+    this.updatePagedBooks();
+  }
+
+  updatePagedBooks() {
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    const paged = this.allBooks.slice(startIndex, endIndex);
+    this.books = of(paged);
   }
 
   // Checks is a book is a favorite for a certain userId

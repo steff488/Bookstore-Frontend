@@ -112,7 +112,7 @@
     fixedTopGap="104"
     style="border-radius: 0"
   >
-    <p>Filters here</p>
+    <app-sidebar></app-sidebar>
   </mat-sidenav>
   <!-- END SIDEBAR  -->
 
@@ -121,6 +121,8 @@
     <!--  CAROUSEL  -->
 
     <!--  END CAROUSEL  -->
+
+    <!--  BOOKS  -->
     @if (books | async; as books) {
     <ng-container>
       <div
@@ -175,11 +177,19 @@
         }
       </div>
     </ng-container>
+    <mat-paginator
+      [length]="numberOfBooks"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[25, 50, 100]"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
     } @else {
     <ng-template #loading>
       <p class="p-4 text-center text-muted">Loading books...</p>
     </ng-template>
     }
+    <!--  END BOOKS -->
   </mat-sidenav-content>
   <!--  END CONTENT  -->
 </mat-sidenav-container>
