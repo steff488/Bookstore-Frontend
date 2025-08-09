@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { MaterialModule } from '../../material/material-module';
 import { CartItemService } from '../../services/cartItem-service/cartItem.service';
 import { CartItem } from '../../models/cartItem';
@@ -9,6 +8,7 @@ import { Book } from '../../models/book';
 import { Navbar } from '../../components/navbar/navbar';
 import { Author } from '../../models/author';
 import { AuthorService } from '../../services/author-service/author.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cart',

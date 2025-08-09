@@ -82,6 +82,7 @@
 
 <!--  TOOLBAR -->
 <div
+  #toolbar
   style="
     position: sticky;
     padding-left: 16px;
@@ -90,14 +91,75 @@
     top: var(--navbar-height);
     z-index: 2;
     background-color: var(--accent-color);
+    display: flex;
+
+    align-items: center;
   "
 >
-  <button matButton (click)="sidenav.toggle()">Filters</button>
-  <!--  CATEGORIES -->
-  @for (category of categories | async; track category.id) {
-  <mat-chip style="margin-right: 5px"> {{category.name | titlecase}} </mat-chip>
-  }
-  <!--  END CATEGORIES -->
+  <!--  TOGGLE FILTERS  -->
+  <button
+    [style.display]="isSticky ? 'block' : 'none'"
+    mat-button
+    (click)="sidenav.toggle()"
+    style="
+      width: 96px;
+      border-radius: 3px !important;
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+      height: calc(var(--toolbar-height) - 10px);
+    "
+  >
+    {{ sideNavOpened ? 'Hide filters' : 'Show filters' }}
+  </button>
+  <!--  END TOGGLE FILTERS  -->
+
+  <mat-divider
+    vertical
+    [style.display]="isSticky ? 'block' : 'none'"
+    style="height: 20px; margin-left: 10px; margin-right: 20px"
+  ></mat-divider>
+
+  <!-- ORDER BY -->
+  <form
+    [style.display]="isSticky ? 'block' : 'none'"
+    style="
+      height: calc(var(--toolbar-height) - 10px);
+      display: flex;
+      align-content: center;
+    "
+  >
+    <label
+      for="orderBy"
+      style="
+        color: #005cbb;
+        font-family: 'Roboto';
+        font-size: 14px;
+        font-weight: 500;
+      "
+      >Order by:</label
+    >
+    <select
+      id="orderBy"
+      name="orderBy"
+      style="
+        margin-left: 10px;
+        padding-left: 5px;
+        padding-right: 5px;
+        height: 100%;
+        border-radius: 3px;
+        cursor: pointer;
+        background-color: var(--primary-color);
+        font-family: 'Roboto';
+        font-size: 14px;
+        font-weight: 500;
+      "
+    >
+      <option value="" selected>No order</option>
+      <option value="priceAsc">Price ascending</option>
+      <option value="priceDesc">Price descending</option>
+    </select>
+  </form>
+  <!--  END ORDER BY  -->
 </div>
 <!--  END TOOLBAR  -->
 
@@ -107,12 +169,22 @@
     #sidenav
     mode="over"
     [(opened)]="sideNavOpened"
+    [style.visibility]="isSticky ? 'visible' : 'hidden'"
     [autoFocus]="false"
     [fixedInViewport]="true"
-    fixedTopGap="104"
-    style="border-radius: 0"
+    fixedTopGap="64"
+    style="border-radius: 0; background-color: var(--accent-color)"
   >
-    <app-sidebar></app-sidebar>
+    <!--  SECTION FOR BOX SHADOW  -->
+    <section
+      style="
+        height: 40px;
+        background-color: var(--accent-color);
+        box-shadow: 0px 3px 7px rgba(25, 18, 7, 0.3);
+      "
+    ></section>
+    <!--  SECTION FOR BOX SHADOW  -->
+    <app-sidebar-content></app-sidebar-content>
   </mat-sidenav>
   <!-- END SIDEBAR  -->
 

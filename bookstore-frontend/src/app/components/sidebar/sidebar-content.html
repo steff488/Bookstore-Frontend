@@ -1,0 +1,68 @@
+<div style="padding: 20px">
+  <h5 style="color: var(--secondary-color)">Categories</h5>
+  <div style="margin-top: 10px">
+    <mat-chip-listbox multiple>
+      @for (category of categories | async; track category.id) {
+      <mat-chip-option
+        style="margin-right: 5px; margin-bottom: 5px"
+        class="custom-chip"
+        [value]="category.id"
+      >
+        {{ category.name | titlecase }}
+      </mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </div>
+
+  <mat-divider style="margin-top: 10px; margin-bottom: 10px"></mat-divider>
+
+  <h5 style="color: var(--secondary-color)">Price</h5>
+  <div style="display: flex; width: 100%">
+    <mat-slider
+      min="{{minPrice}}"
+      max="{{maxPrice}}"
+      discrete
+      style="width: 100%"
+    >
+      <input value="{{minPrice}}" matSliderStartThumb />
+      <input value="{{maxPrice}}" matSliderEndThumb />
+    </mat-slider>
+  </div>
+
+  <mat-divider style="margin-top: 5px; margin-bottom: 10px"></mat-divider>
+
+  <h5 style="color: var(--secondary-color)">Max number of pages</h5>
+  <div style="display: flex; width: 100%">
+    <mat-slider
+      min="{{minNumberOfPages}}"
+      max="{{maxNumberOfPages}}"
+      discrete
+      style="width: 100%"
+    >
+      <input value="{{maxNumberOfPages}}" matSliderThumb />
+    </mat-slider>
+  </div>
+
+  <mat-divider style="margin-top: 5px; margin-bottom: 10px"></mat-divider>
+
+  <h5 style="color: var(--secondary-color)">Minimum rating</h5>
+  <div style="display: flex; width: 100%">
+    <mat-slider min="0" max="5" discrete showTickMarks style="width: 100%">
+      <input value="0" matSliderThumb />
+    </mat-slider>
+  </div>
+
+  <mat-divider style="margin-top: 5px; margin-bottom: 10px"></mat-divider>
+
+  <button
+    mat-stroked-button
+    style="
+      margin-top: 5px;
+      border-radius: 3px;
+      padding-left: 16px;
+      padding-right: 16px;
+    "
+  >
+    Apply filters
+  </button>
+</div>

@@ -1,12 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
-
 :root {
   --navbar-height: 64px;
   --toolbar-height: 40px;
 
-  --accent-color: #d2b186;
-  --secondary-color: #191207;
   --primary-color: #f0e9de;
+  --secondary-color: #191207;
+  --accent-color: #d2b186;
+  --contrast-color: #6997d0;
 }
 
 body {

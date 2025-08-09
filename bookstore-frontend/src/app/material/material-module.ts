@@ -11,11 +11,18 @@ import {
 } from '@angular/material/sidenav';
 import { MatDivider } from '@angular/material/divider';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { MatChipGrid, MatChipRow } from '@angular/material/chips';
+import {
+  MatChipGrid,
+  MatChipRow,
+  MatChipListbox,
+  MatChip,
+  MatChipSet,
+  MatChipOption,
+} from '@angular/material/chips';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
-import { MatChip, MatChipSet } from '@angular/material/chips';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSliderModule } from '@angular/material/slider';
 
 const MaterialComponents = [MatButtonModule];
 
@@ -42,6 +49,9 @@ const MaterialComponents = [MatButtonModule];
     MatChip,
     MatChipSet,
     MatPaginatorModule,
+    MatSliderModule,
+    MatChipListbox,
+    MatChipOption,
   ],
   exports: [
     MaterialComponents,
@@ -65,6 +75,9 @@ const MaterialComponents = [MatButtonModule];
     MatChip,
     MatChipSet,
     MatPaginatorModule,
+    MatSliderModule,
+    MatChipListbox,
+    MatChipOption,
   ],
 })
 export class MaterialModule {}

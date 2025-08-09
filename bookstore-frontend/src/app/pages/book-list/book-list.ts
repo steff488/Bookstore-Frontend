@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, viewChild } from '@angular/core';
 import { BookService } from '../../services/book-service/book.service';
 import { Book } from '../../models/book';
 import { CategoryService } from '../../services/category-service/category.service';
@@ -9,12 +9,12 @@ import { CartItemService } from '../../services/cartItem-service/cartItem.servic
 import { CartItem } from '../../models/cartItem';
 import { Observable, of } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { MaterialModule } from '../../material/material-module';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../components/navbar/navbar';
-import { Sidebar } from '../../components/sidebar/sidebar';
+import { SidebarContent } from '../../components/sidebar/sidebar-content';
 import { PageEvent } from '@angular/material/paginator';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-book-list',
@@ -27,7 +27,7 @@ import { PageEvent } from '@angular/material/paginator';
     MaterialModule,
     FormsModule,
     Navbar,
-    Sidebar,
+    SidebarContent,
   ],
 })
 export class BookList {
@@ -48,10 +48,23 @@ export class BookList {
   scrollY = 0;
   isScrolledToTop = true;
 
+  toolbar = viewChild<ElementRef>('toolbar');
+  isSticky = false;
+
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.scrollY = window.pageYOffset;
     this.isScrolledToTop = window.scrollY === 0;
+
+    const myToolbar = this.toolbar();
+    if (myToolbar) {
+      const rect = myToolbar.nativeElement.getBoundingClientRect();
+      this.isSticky = Math.abs(rect.top - 64) < 1;
+    }
+
+    if (!this.isSticky) {
+      this.sideNavOpened = false;
+    }
   }
 
   constructor(

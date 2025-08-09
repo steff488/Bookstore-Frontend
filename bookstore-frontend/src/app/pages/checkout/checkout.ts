@@ -8,4 +8,8 @@ import { MaterialModule } from '../../material/material-module';
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })
-export class Checkout {}
+export class Checkout {
+  constructor() {}
+
+  ngOnInit(): void {}
+}
