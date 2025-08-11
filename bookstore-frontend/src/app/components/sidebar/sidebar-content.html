@@ -4,7 +4,7 @@
     <mat-chip-listbox multiple>
       @for (category of categories | async; track category.id) {
       <mat-chip-option
-        style="margin-right: 5px; margin-bottom: 5px"
+        style="margin-right: 0px; margin-bottom: 5px"
         class="custom-chip"
         [value]="category.id"
       >
@@ -54,15 +54,7 @@
 
   <mat-divider style="margin-top: 5px; margin-bottom: 10px"></mat-divider>
 
-  <button
-    mat-stroked-button
-    style="
-      margin-top: 5px;
-      border-radius: 3px;
-      padding-left: 16px;
-      padding-right: 16px;
-    "
-  >
+  <button mat-stroked-button class="custom-button" style="margin-top: 5px">
     Apply filters
   </button>
 </div>

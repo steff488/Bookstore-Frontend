@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './sidebar-content.html',
   styleUrl: './sidebar-content.css',
 })
+
 export class SidebarContent {
   minPrice: number = 0;
   maxPrice: number = 0;

@@ -6,6 +6,11 @@
   border-color: var(--contrast-color) !important;
 }
 
+.custom-chip.mdc-evolution-chip--selected,
+.custom-chip.mat-mdc-chip.mdc-evolution-chip--selected {
+  background-color: #75a0d5 !important;
+}
+
 ::ng-deep .mdc-slider__track {
   background-color: #e1cbae !important;
 }
@@ -21,23 +26,4 @@
 ::ng-deep .mdc-slider__value-indicator {
   background-color: var(--contrast-color) !important;
   color: var(--secondary-color) !important;
-}
-
-.custom-chip.mdc-evolution-chip--selected,
-.custom-chip.mat-mdc-chip.mdc-evolution-chip--selected {
-  background-color: #75a0d5 !important;
-}
-
-.custom-button {
-  padding: 5px;
-  padding-left: 12px;
-  padding-right: 12px;
-  background-color: #6494ce;
-  border: none;
-  color: var(--secondary-color);
-  border-radius: 5px;
-}
-
-.custom-button:hover {
-  background-color: #78a1d3;
 }
