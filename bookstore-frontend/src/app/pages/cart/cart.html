@@ -1,5 +1,5 @@
 <!--  NAVBAR  -->
-<app-navbar></app-navbar>
+<app-navbar [showSearch]="false"></app-navbar>
 <!--  END NAVBAR  -->
 
 <div
@@ -103,8 +103,13 @@
           <button
             mat-icon-button
             (click)="decrementCartItemQuantity(cartItem.id!)"
+            [disabled]="cartItem.quantity == 1 ? true : false"
           >
-            <mat-icon style="margin-bottom: 3px" class="remove-icon">
+            <mat-icon
+              style="margin-bottom: 3px"
+              class="remove-icon"
+              [style.color]="cartItem.quantity == 1 ? '#babab9' : 'inherit'"
+            >
               remove
             </mat-icon>
           </button>

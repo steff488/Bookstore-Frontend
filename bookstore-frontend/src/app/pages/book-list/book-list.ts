@@ -13,8 +13,9 @@ import { MaterialModule } from '../../material/material-module';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../../components/navbar/navbar';
 import { SidebarContent } from '../../components/sidebar/sidebar-content';
-import { PageEvent } from '@angular/material/paginator';
+import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { RouterModule } from '@angular/router';
+import { SearchService } from '../../services/search/search.service';
 
 @Component({
   selector: 'app-book-list',
@@ -33,11 +34,11 @@ import { RouterModule } from '@angular/router';
 export class BookList {
   userId!: number;
 
+  // For pagination
   books!: Observable<Book[]>;
   categories!: Observable<Category[]>;
 
   allBooks: Book[] = [];
-  numberOfBooks = 0;
   pageSize = 25;
   currentPage = 0;
 
@@ -49,7 +50,11 @@ export class BookList {
   isScrolledToTop = true;
 
   toolbar = viewChild<ElementRef>('toolbar');
+  paginator = viewChild<MatPaginator>('paginator'); // Add this line
   isSticky = false;
+
+  searchQuery = '';
+  filteredBooks = this.allBooks;
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -71,10 +76,10 @@ export class BookList {
     private bookService: BookService,
     private categoryService: CategoryService,
     private favoriteItemService: FavoriteItemService,
-    private cartItemService: CartItemService
+    private cartItemService: CartItemService,
+    private searchService: SearchService
   ) {}
 
-  // Repeat books as there aren't enougn in the database to require scrolling
   ngOnInit(): void {
     // const urserIdStr = localStorage.getItem('userId');
     const userIdStr = 1;
@@ -90,8 +95,8 @@ export class BookList {
 
     this.bookService.getBooks().subscribe((books) => {
       this.allBooks = books;
-      this.numberOfBooks = books.length;
-      this.updatePagedBooks();
+      this.filteredBooks = books;
+      this.resetPagination(); // Use helper method
     });
 
     this.favoriteItemService.getAllByUserId(this.userId).subscribe({
@@ -107,6 +112,14 @@ export class BookList {
       },
       error: (err) => console.error('Failed to load cart items:', err),
     });
+
+    // Get book from searchService
+    this.searchService.currentSearchQuery.subscribe((query) => {
+      this.filteredBooks = this.allBooks.filter((book) =>
+        book.title.toLowerCase().includes(query.toLowerCase())
+      );
+      this.resetPagination(); // Reset pagination when search changes
+    });
   }
 
   onPageChange(event: PageEvent) {
@@ -118,8 +131,18 @@ export class BookList {
   updatePagedBooks() {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    const paged = this.allBooks.slice(startIndex, endIndex);
+    const paged = this.filteredBooks.slice(startIndex, endIndex);
     this.books = of(paged);
+  }
+
+  // Helper method to reset pagination
+  private resetPagination() {
+    this.currentPage = 0;
+    const paginator = this.paginator();
+    if (paginator) {
+      paginator.pageIndex = 0; // Reset the paginator's page index
+    }
+    this.updatePagedBooks();
   }
 
   // Checks is a book is a favorite for a certain userId
@@ -236,5 +259,22 @@ export class BookList {
       },
       error: (err) => console.error('Failed to update cart quantity:', err),
     });
+  }
+
+  onSearch() {
+    if (this.searchQuery.trim()) {
+      this.bookService.searchBooks(this.searchQuery).subscribe((data) => {
+        this.allBooks = data;
+        this.filteredBooks = data;
+        this.resetPagination(); // Use helper method
+      });
+    } else {
+      // If the search query is empty, reset
+      this.bookService.getBooks().subscribe((books) => {
+        this.allBooks = books;
+        this.filteredBooks = books;
+        this.resetPagination(); // Use helper method
+      });
+    }
   }
 }

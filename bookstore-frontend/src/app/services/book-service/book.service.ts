@@ -35,4 +35,11 @@ export class BookService {
   deleteBook(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  // 6. Search books by title
+  searchBooks(query: string): Observable<Book[]> {
+    return this.http.get<Book[]>(`${this.apiUrl}/search`, {
+      params: { query },
+    });
+  }
 }

@@ -1,5 +1,5 @@
 <!--  NAVBAR  -->
-<app-navbar></app-navbar>
+<app-navbar [showSearch]="true"></app-navbar>
 <!--  END NAVBAR  -->
 
 <!--  BOOKS BACK  -->
@@ -196,7 +196,7 @@
           background: var(--secondary-color);
         "
       >
-        @for (book of books; track book.id) {
+        @for (book of filteredBooks; track book.id) {
         <mat-card
           class="cursor-pointer shadow-sm border rounded h-100"
           style="
@@ -240,14 +240,17 @@
         }
       </div>
     </ng-container>
+    <!--  PAGINATION  -->
     <mat-paginator
-      [length]="numberOfBooks"
+      #paginator
+      [length]="filteredBooks.length"
       [pageSize]="pageSize"
       [pageSizeOptions]="[25, 50, 100]"
       (page)="onPageChange($event)"
       style="background-color: var(--accent-color)"
     >
     </mat-paginator>
+    <!--  END PAGINATION  -->
     } @else {
     <ng-template #loading>
       <p class="p-4 text-center text-muted">Loading books...</p>

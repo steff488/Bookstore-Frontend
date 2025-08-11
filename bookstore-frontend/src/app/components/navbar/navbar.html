@@ -31,6 +31,7 @@
   <span class="flex-grow-1"></span>
 
   <!--  SEARCH BOX  -->
+  @if (showSearch) {
   <div class="d-flex align-items-center position-relative">
     <form class="search-form" [class.active]="searchQuery.length > 0" action="">
       <input
@@ -38,6 +39,7 @@
         type="text"
         placeholder="Search..."
         [(ngModel)]="searchQuery"
+        (input)="onSearch($event)"
         name="search"
       />
       <div class="search-icon-container">
@@ -45,6 +47,7 @@
       </div>
     </form>
   </div>
+  }
   <!--  END SEARCH BOX  -->
 
   <mat-divider class="mx-3" vertical style="height: 40%"></mat-divider>
