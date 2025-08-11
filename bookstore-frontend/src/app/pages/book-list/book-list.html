@@ -103,7 +103,7 @@
     (click)="sidenav.toggle()"
     style="
       width: 96px;
-      border-radius: 3px !important;
+      border-radius: 5px !important;
       padding-left: 10px !important;
       padding-right: 10px !important;
       height: calc(var(--toolbar-height) - 10px);
@@ -128,30 +128,21 @@
       align-content: center;
     "
   >
-    <label
-      for="orderBy"
-      style="
-        color: #005cbb;
-        font-family: 'Roboto';
-        font-size: 14px;
-        font-weight: 500;
-      "
+    <label for="orderBy" class="sidebar-font" style="color: #005cbb"
       >Order by:</label
     >
     <select
       id="orderBy"
       name="orderBy"
+      class="sidebar-font"
       style="
         margin-left: 10px;
         padding-left: 5px;
         padding-right: 5px;
         height: 100%;
-        border-radius: 3px;
+        border-radius: 5px;
         cursor: pointer;
         background-color: var(--primary-color);
-        font-family: 'Roboto';
-        font-size: 14px;
-        font-weight: 500;
       "
     >
       <option value="" selected>No order</option>
@@ -254,6 +245,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="[25, 50, 100]"
       (page)="onPageChange($event)"
+      style="background-color: var(--accent-color)"
     >
     </mat-paginator>
     } @else {

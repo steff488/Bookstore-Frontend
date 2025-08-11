@@ -7,9 +7,28 @@
   --secondary-color: #191207;
   --accent-color: #d2b186;
   --contrast-color: #6997d0;
+
+  --mat-chip-container-shape-radius: 5px;
 }
 
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.custom-button {
+  border-radius: 5px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.sidebar-font {
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.custom-font {
+  font-family: "Roboto";
+  font-weight: 500;
 }

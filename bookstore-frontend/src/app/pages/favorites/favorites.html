@@ -1,19 +1,48 @@
 <!--  NAVBAR  -->
 <app-navbar></app-navbar>
 <!--  END NAVBAR  -->
+<div
+  style="
+    position: sticky;
+    top: var(--navbar-height);
+    background-color: var(--accent-color);
+    height: 5px;
+    width: 100%;
+  "
+></div>
 
-@if (favoriteItems) {
-<div>
-  @for (favorite of favoriteItems; track favorite.id) {
-  <div>
+<div
+  style="
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-height) - 5px);
+    padding: 25px;
+    background-color: var(--secondary-color);
+    background: radial-gradient(
+      circle at center,
+      #30220c 20%,
+      #27190b 60%,
+      #191207 90%
+    );
+  "
+>
+  @if (favoriteItems) { @for (favorite of favoriteItems; track favorite.id) {
+  <div
+    style="
+      background-color: var(--primary-color);
+      height: 150px;
+      width: 100%;
+      margin-bottom: 20px;
+      justify-self: center;
+      border-radius: 6px;
+    "
+  >
     Book {{ favorite.bookId }}
     <button (click)="removeFromFavorites(favorite.bookId)">
       Remove from favorites
     </button>
     <button (click)="addToCart(favorite.bookId)">Add to cart</button>
   </div>
+  } } @else {
+  <ng-template #loading>Loading…</ng-template>
   }
 </div>
-} @else {
-<ng-template #loading>Loading…</ng-template>
-}

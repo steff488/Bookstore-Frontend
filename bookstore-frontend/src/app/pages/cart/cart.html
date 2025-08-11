@@ -2,26 +2,229 @@
 <app-navbar></app-navbar>
 <!--  END NAVBAR  -->
 
-@if (cartItems) {
-<div>
-  @for (cartItem of cartItems; track cartItem.id) { @for (book of books; track
-  book.id) { @if(book.id === cartItem.bookId) {
+<div
+  style="
+    position: sticky;
+    top: var(--navbar-height);
+    background-color: var(--accent-color);
+    height: 5px;
+    width: 100%;
+  "
+></div>
 
-  <div>
-    {{ book.title }} - {{ getAuthorNameForBook(book.id) }} - Quantity {{
-    cartItem.quantity }}
-  </div>
-  <button (click)="removeFromCart(cartItem.id!)">Remove from cart</button>
-  <button (click)="decrementCartItemQuantity(cartItem.id!)">
-    Decrement quantity
-  </button>
-  <button (click)="incrementCartItemQuantity(cartItem.id!)">
-    Increment quantity
-  </button>
-  } } }
-  <div>Total: ${{ total | number:'1.2-2' }} lei</div>
-  <button [routerLink]="['/checkout']">Go to checkout</button>
+<div
+  style="
+    display: flex;
+    flex-direction: row;
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-height) - 5px);
+    padding: 25px;
+    background-color: var(--secondary-color);
+    background: radial-gradient(
+      circle at center,
+      #30220c 20%,
+      #27190b 60%,
+      #191207 90%
+    );
+  "
+>
+  @if (cartItems) {
+  <section style="flex: 2">
+    <section
+      class="custom-font"
+      style="
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 50px;
+        align-items: center;
+        padding-left: 20px;
+        padding-right: 20px;
+        background-color: var(--primary-color);
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 18px;
+      "
+    >
+      <div style="flex: 4">Product information</div>
+      <div style="flex: 2; text-align: center">Quantity</div>
+      <div style="flex: 2; text-align: center">Price</div>
+      <div style="flex: 1; text-align: right">Remove</div>
+    </section>
+
+    @for (cartItem of cartItems; track cartItem.id) { @for (book of books; track
+    book.id) { @if(book.id === cartItem.bookId) {
+
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        background-color: var(--primary-color);
+        height: 150px;
+        width: 100%;
+        padding: 20px;
+        margin-bottom: 20px;
+        justify-self: center;
+        border-radius: 5px;
+      "
+    >
+      <!--  BOOK INFORMATION  -->
+      <section style="flex: 4; display: flex; flex-direction: row">
+        <img
+          mat-card-image
+          [routerLink]="['/books', book.id]"
+          role="button"
+          src="assets/book.png"
+          alt="{{ book.title }} cover"
+          style="height: 100%; object-fit: cover; margin-right: 20px"
+        />
+        <div style="align-content: center">
+          <div style="font-family: 'Roboto'; font-weight: 500; font-size: 25px">
+            {{ book.title }}
+          </div>
+          <div style="font-family: 'Roboto'; font-size: 18px">
+            {{ getAuthorNameForBook(book.id) }}
+          </div>
+        </div>
+      </section>
+      <!--  END BOOK INFORMATION-->
+
+      <!--  QUANTITY  -->
+      <section
+        style="
+          flex: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <div style="display: flex">
+          <button
+            mat-icon-button
+            (click)="decrementCartItemQuantity(cartItem.id!)"
+          >
+            <mat-icon style="margin-bottom: 3px" class="remove-icon">
+              remove
+            </mat-icon>
+          </button>
+          <div
+            class="custom-font"
+            style="
+              font-size: 18px;
+              margin-left: 10px;
+              margin-right: 10px;
+              align-content: center;
+            "
+          >
+            {{cartItem.quantity }}
+          </div>
+          <button
+            mat-icon-button
+            (click)="incrementCartItemQuantity(cartItem.id!)"
+          >
+            <mat-icon style="margin-bottom: 3px" class="add-icon">
+              add
+            </mat-icon>
+          </button>
+        </div>
+      </section>
+      <!--  END QUANTITY  -->
+
+      <!--  PRICE-->
+      <section style="flex: 2; align-content: center; font-size: 18px">
+        <div class="custom-font" style="text-align: center">
+          {{ (book.price * cartItem.quantity) | number: '1.2-2' }} lei
+        </div>
+      </section>
+      <!--  END PRICE -->
+
+      <!--  REMOVE BUTTON -->
+      <section
+        style="
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        "
+      >
+        <button
+          mat-icon-button
+          aria-label="Clear"
+          (click)="removeFromCart(cartItem.id!)"
+          class="clear-icon"
+          style="
+            background-color: transparent;
+            border: none;
+            margin-right: 10px;
+          "
+        >
+          <mat-icon style="margin-bottom: 3px">clear</mat-icon>
+        </button>
+      </section>
+      <!--  END REMOVE BUTTON -->
+    </div>
+    }}}
+  </section>
+
+  <!--  CART INFO SECTION  -->
+  <section style="flex: 1; padding-left: 25px">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: calc(var(--navbar-height) + 5px + 25px);
+        background-color: var(--primary-color);
+        border-radius: 5px;
+        height: 220px;
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+      "
+    >
+      <div
+        class="custom-font"
+        style="
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 50px;
+          font-size: 18px;
+        "
+      >
+        Order summary
+      </div>
+      <mat-divider></mat-divider>
+      <div style="margin-top: 15px">
+        Cost of products:
+        <span class="custom-font">{{ total | number:'1.2-2' }} lei</span>
+      </div>
+      <div>Delivery cost: <span class="custom-font">15.00 lei</span></div>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          margin-top: auto;
+          padding-bottom: 19px;
+        "
+      >
+        <div class="custom-font" style="align-self: center; font-size: 20px">
+          Total: {{ (total + 15) | number:'1.2-2' }} lei
+        </div>
+        <button
+          mat-stroked-button
+          [routerLink]="['/checkout']"
+          class="custom-button"
+          style="font-size: 16px"
+        >
+          <span style="font-size: 20px">>></span> Continue to checkout
+        </button>
+      </div>
+    </div>
+  </section>
+  <!--  END CART INFO SECTION  -->
+  } @else {
+  <ng-template #loading>Loading…</ng-template>
+  }
 </div>
-} @else {
-<ng-template #loading>Loading…</ng-template>
-}
