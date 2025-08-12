@@ -1,4 +1,5 @@
 import { Component, ElementRef, HostListener, viewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { BookService } from '../../services/book-service/book.service';
 import { Book } from '../../models/book';
 import { CategoryService } from '../../services/category-service/category.service';
@@ -59,6 +60,25 @@ export class BookList {
   searchQuery = '';
   filteredBooks = this.allBooks;
 
+  sortOption = '';
+
+  constructor(
+    private bookService: BookService,
+    private categoryService: CategoryService,
+    private favoriteItemService: FavoriteItemService,
+    private cartItemService: CartItemService,
+    private searchService: SearchService,
+    private filterService: FilterService,
+    private router: Router
+  ) {}
+
+  openBookDetails(bookId: number) {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/books', bookId])
+    );
+    window.open(url, '_blank');
+  }
+
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.scrollY = window.pageYOffset;
@@ -74,15 +94,6 @@ export class BookList {
       this.sideNavOpened = false;
     }
   }
-
-  constructor(
-    private bookService: BookService,
-    private categoryService: CategoryService,
-    private favoriteItemService: FavoriteItemService,
-    private cartItemService: CartItemService,
-    private searchService: SearchService,
-    private filterService: FilterService
-  ) {}
 
   ngOnInit(): void {
     // const urserIdStr = localStorage.getItem('userId');
@@ -332,5 +343,18 @@ export class BookList {
         this.resetPagination(); // Use helper method
       });
     }
+  }
+
+  applySort() {
+    this.filteredBooks.sort((a, b) => {
+      if (this.sortOption == 'priceAsc') {
+        return a.price - b.price;
+      } else if (this.sortOption == 'priceDesc') {
+        return b.price - a.price;
+      }
+      return 0;
+    });
+
+    this.resetPagination();
   }
 }

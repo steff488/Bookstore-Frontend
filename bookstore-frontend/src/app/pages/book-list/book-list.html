@@ -132,6 +132,8 @@
       >Order by:</label
     >
     <select
+      [(ngModel)]="sortOption"
+      (change)="applySort()"
       id="orderBy"
       name="orderBy"
       class="sidebar-font"
@@ -188,59 +190,97 @@
     <!--  BOOKS  -->
     <ng-container>
       <div
-        class="d-grid p-3"
         style="
+          display: grid;
+          padding: 20px;
+          padding-top: 25px;
+          padding-bottom: 25px;
           grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
           min-height: calc(
             100dvh - var(--navbar-height) - var(--toolbar-height) - 56px
           );
-          gap: 1rem;
+          gap: 16px;
           background: var(--secondary-color);
         "
       >
-        @if (books | async; as books) { @for (book of filteredBooks; track
-        book.id) {
+        @if (books | async; as paginatedBooks) { @for (book of paginatedBooks;
+        track book.id) {
         <mat-card
-          class="cursor-pointer shadow-sm border rounded h-100"
+          (click)="openBookDetails(book.id)"
           style="
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
             width: 100%;
             height: 420px;
             padding: 10px;
             background: var(--primary-color);
+            cursor: pointer;
           "
         >
-          <a
-            [routerLink]="['/books', book.id]"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <mat-card-header class="p-0 border-0">
-              <img
-                mat-card-image
-                role="button"
-                src="assets/book.png"
-                alt="{{ book.title }} cover"
-                class="w-100 d-block mx-auto"
-                style="height: 160px; object-fit: cover"
-              />
-            </mat-card-header>
-          </a>
+          <mat-card-header style="padding: 0; border: none">
+            <img
+              mat-card-image
+              role="button"
+              src="assets/book.png"
+              alt="{{ book.title }} cover"
+              style="
+                height: 160px;
+                width: 100%;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                object-fit: cover;
+              "
+            />
+          </mat-card-header>
 
-          <mat-card-content class="p-2">
-            <h5 class="fw-semibold fs-6 mb-1 text-truncate">
+          <mat-card-content style="padding: 8px">
+            <h5
+              style="
+                font-weight: 600;
+                font-size: 16px;
+                margin-bottom: 4px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              "
+            >
               {{ book.title }}
             </h5>
-            <p class="small mb-1 text-truncate">Author: {{ book.authorId }}</p>
-
-            <p class="small mb-1">Category: {{ book.categoryId }}</p>
-            <p class="small mb-1">Price: {{ book.price }} lei</p>
-            <p class="small mb-1">Stock: {{ book.stock }}</p>
-            <p class="small mb-1">Rating: {{ book.rating }}</p>
-            <p class="small mb-0">Published: {{ book.publicationDate }}</p>
-            <button (click)="toggleFavorite(book.id)">
+            <p
+              style="
+                font-size: 14px;
+                margin-bottom: 4px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              "
+            >
+              Author: {{ book.authorId }}
+            </p>
+            <p style="font-size: 14px; margin-bottom: 4px">
+              Category: {{ book.categoryId }}
+            </p>
+            <p style="font-size: 14px; margin-bottom: 4px">
+              Price: {{ book.price }} lei
+            </p>
+            <p style="font-size: 14px; margin-bottom: 4px">
+              Stock: {{ book.stock }}
+            </p>
+            <p style="font-size: 14px; margin-bottom: 4px">
+              Rating: {{ book.rating }}
+            </p>
+            <p style="font-size: 14px; margin-bottom: 4px">
+              Published: {{ book.publicationDate }}
+            </p>
+            <!-- Stops the opening of bookDetails page-->
+            <button (click)="toggleFavorite(book.id); $event.stopPropagation()">
               {{ getFavoriteButtonText(book.id) }}
             </button>
-            <button (click)="addToCart(book.id)">Add to cart</button>
+            <!-- Stops the opening of bookDetails page-->
+            <button (click)="addToCart(book.id); $event.stopPropagation()">
+              Add to cart
+            </button>
           </mat-card-content>
         </mat-card>
         } }
