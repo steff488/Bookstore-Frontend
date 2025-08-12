@@ -3,6 +3,7 @@ import { BookService } from '../../services/book-service/book.service';
 import { Book } from '../../models/book';
 import { CategoryService } from '../../services/category-service/category.service';
 import { Category } from '../../models/category';
+import { BookFilters } from '../../models/bookFilters';
 import { FavoriteItemService } from '../../services/favoriteItem-service/favorite-item.service';
 import { FavoriteItem } from '../../models/favoriteItem';
 import { CartItemService } from '../../services/cartItem-service/cartItem.service';
@@ -15,7 +16,9 @@ import { Navbar } from '../../components/navbar/navbar';
 import { SidebarContent } from '../../components/sidebar/sidebar-content';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { RouterModule } from '@angular/router';
-import { SearchService } from '../../services/search/search.service';
+import { SearchService } from '../../services/search-service/search.service';
+import { FilterService } from '../../services/filter-service/filter-service';
+import { L, M } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-book-list',
@@ -77,7 +80,8 @@ export class BookList {
     private categoryService: CategoryService,
     private favoriteItemService: FavoriteItemService,
     private cartItemService: CartItemService,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private filterService: FilterService
   ) {}
 
   ngOnInit(): void {
@@ -96,7 +100,7 @@ export class BookList {
     this.bookService.getBooks().subscribe((books) => {
       this.allBooks = books;
       this.filteredBooks = books;
-      this.resetPagination(); // Use helper method
+      this.resetPagination();
     });
 
     this.favoriteItemService.getAllByUserId(this.userId).subscribe({
@@ -113,13 +117,65 @@ export class BookList {
       error: (err) => console.error('Failed to load cart items:', err),
     });
 
-    // Get book from searchService
+    // Get books from searchService
     this.searchService.currentSearchQuery.subscribe((query) => {
-      this.filteredBooks = this.allBooks.filter((book) =>
-        book.title.toLowerCase().includes(query.toLowerCase())
-      );
-      this.resetPagination(); // Reset pagination when search changes
+      this.applySearchAndFilters(query);
     });
+
+    // Get books from filterService
+    this.filterService.currentFilters.subscribe((filters) => {
+      this.applySearchAndFilters(this.searchQuery, filters);
+    });
+  }
+
+  private applySearchAndFilters(searchQuery = '', filters?: BookFilters) {
+    // Close the sidebar when applying filters
+    this.sideNavOpened = false;
+
+    this.searchQuery = searchQuery;
+    this.filteredBooks = this.allBooks.filter((book) => {
+      let matchesSearch = true;
+      let matchesCategory = true;
+      let matchesPrice = true;
+      let matchedPages = true;
+      let matchesRating = true;
+
+      if (searchQuery) {
+        matchesSearch = book.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+      }
+
+      if (filters) {
+        if (filters.categoryIds?.length) {
+          matchesCategory = filters.categoryIds.includes(
+            Number(book.categoryId)
+          );
+        }
+
+        if (filters.maxPrice && filters.minPrice) {
+          matchesPrice =
+            book.price >= filters.minPrice && book.price <= filters.maxPrice;
+        }
+
+        if (filters.maxPages) {
+          matchedPages = book.pageCount <= filters.maxPages;
+        }
+
+        if (filters.minRating) {
+          matchesRating = book.rating >= filters.minRating;
+        }
+      }
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesPrice &&
+        matchedPages &&
+        matchesRating
+      );
+    });
+    // Reset pagination when search changes
+    this.resetPagination();
   }
 
   onPageChange(event: PageEvent) {

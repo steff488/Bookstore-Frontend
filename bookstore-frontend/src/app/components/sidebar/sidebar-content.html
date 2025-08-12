@@ -1,7 +1,7 @@
 <div style="padding: 20px">
   <h5 style="color: var(--secondary-color)">Categories</h5>
   <div style="margin-top: 10px">
-    <mat-chip-listbox multiple>
+    <mat-chip-listbox multiple [(ngModel)]="selectedCategoriesFilter">
       @for (category of categories | async; track category.id) {
       <mat-chip-option
         style="margin-right: 0px; margin-bottom: 5px"
@@ -19,13 +19,21 @@
   <h5 style="color: var(--secondary-color)">Price</h5>
   <div style="display: flex; width: 100%">
     <mat-slider
-      min="{{minPrice}}"
-      max="{{maxPrice}}"
+      min="{{priceRange[0]}}"
+      max="{{priceRange[1]}}"
       discrete
       style="width: 100%"
     >
-      <input value="{{minPrice}}" matSliderStartThumb />
-      <input value="{{maxPrice}}" matSliderEndThumb />
+      <input
+        [(ngModel)]="priceRangeFilter[0]"
+        value="{{priceRange[0]}}"
+        matSliderStartThumb
+      />
+      <input
+        [(ngModel)]="priceRangeFilter[1]"
+        value="{{priceRange[1]}}"
+        matSliderEndThumb
+      />
     </mat-slider>
   </div>
 
@@ -34,12 +42,12 @@
   <h5 style="color: var(--secondary-color)">Max number of pages</h5>
   <div style="display: flex; width: 100%">
     <mat-slider
-      min="{{minNumberOfPages}}"
-      max="{{maxNumberOfPages}}"
+      min="{{minPages}}"
+      max="{{maxPages}}"
       discrete
       style="width: 100%"
     >
-      <input value="{{maxNumberOfPages}}" matSliderThumb />
+      <input [(ngModel)]="maxPagesFilter" value="{{maxPages}}" matSliderThumb />
     </mat-slider>
   </div>
 
@@ -48,13 +56,18 @@
   <h5 style="color: var(--secondary-color)">Minimum rating</h5>
   <div style="display: flex; width: 100%">
     <mat-slider min="0" max="5" discrete showTickMarks style="width: 100%">
-      <input value="0" matSliderThumb />
+      <input [(ngModel)]="minRatingFilter" value="0" matSliderThumb />
     </mat-slider>
   </div>
 
   <mat-divider style="margin-top: 5px; margin-bottom: 10px"></mat-divider>
 
-  <button mat-stroked-button class="custom-button" style="margin-top: 5px">
+  <button
+    (click)="applyFilters()"
+    mat-stroked-button
+    class="custom-button"
+    style="margin-top: 5px"
+  >
     Apply filters
   </button>
 </div>

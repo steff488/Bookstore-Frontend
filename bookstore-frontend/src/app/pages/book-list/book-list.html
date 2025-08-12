@@ -5,7 +5,7 @@
 <!--  BOOKS BACK  -->
 <div
   style="
-    height: calc(100svh - var(--navbar-height));
+    height: calc(100dvh - var(--navbar-height));
     top: var(--navbar-height);
     background-image: url(./assets/books32.png);
     background-size: cover;
@@ -20,7 +20,7 @@
 <div
   style="
     position: absolute;
-    height: calc(100svh - var(--navbar-height));
+    height: calc(100dvh - var(--navbar-height));
     width: 60%;
     top: var(--navbar-height);
     right: 0;
@@ -68,7 +68,7 @@
 <div
   style="
     position: absolute;
-    height: calc(100svh - var(--navbar-height));
+    height: calc(100dvh - var(--navbar-height));
     width: 100%;
     top: var(--navbar-height);
     background-image: url(./assets/books-front.png);
@@ -186,17 +186,20 @@
     <!--  END CAROUSEL  -->
 
     <!--  BOOKS  -->
-    @if (books | async; as books) {
     <ng-container>
       <div
         class="d-grid p-3"
         style="
           grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+          min-height: calc(
+            100dvh - var(--navbar-height) - var(--toolbar-height) - 56px
+          );
           gap: 1rem;
           background: var(--secondary-color);
         "
       >
-        @for (book of filteredBooks; track book.id) {
+        @if (books | async; as books) { @for (book of filteredBooks; track
+        book.id) {
         <mat-card
           class="cursor-pointer shadow-sm border rounded h-100"
           style="
@@ -206,19 +209,22 @@
             background: var(--primary-color);
           "
         >
-          <mat-card-header
-            class="p-0 border-0"
+          <a
             [routerLink]="['/books', book.id]"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <img
-              mat-card-image
-              role="button"
-              src="assets/book.png"
-              alt="{{ book.title }} cover"
-              class="w-100 d-block mx-auto"
-              style="height: 160px; object-fit: cover"
-            />
-          </mat-card-header>
+            <mat-card-header class="p-0 border-0">
+              <img
+                mat-card-image
+                role="button"
+                src="assets/book.png"
+                alt="{{ book.title }} cover"
+                class="w-100 d-block mx-auto"
+                style="height: 160px; object-fit: cover"
+              />
+            </mat-card-header>
+          </a>
 
           <mat-card-content class="p-2">
             <h5 class="fw-semibold fs-6 mb-1 text-truncate">
@@ -237,7 +243,7 @@
             <button (click)="addToCart(book.id)">Add to cart</button>
           </mat-card-content>
         </mat-card>
-        }
+        } }
       </div>
     </ng-container>
     <!--  PAGINATION  -->
@@ -247,15 +253,14 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="[25, 50, 100]"
       (page)="onPageChange($event)"
-      style="background-color: var(--accent-color)"
+      style="
+        background-color: var(--accent-color);
+        font-size: 14px !important;
+        font-family: 'Roboto';
+      "
     >
     </mat-paginator>
     <!--  END PAGINATION  -->
-    } @else {
-    <ng-template #loading>
-      <p class="p-4 text-center text-muted">Loading books...</p>
-    </ng-template>
-    }
     <!--  END BOOKS -->
   </mat-sidenav-content>
   <!--  END CONTENT  -->

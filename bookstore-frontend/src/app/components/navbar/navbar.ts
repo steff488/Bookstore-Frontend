@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 import { MaterialModule } from '../../material/material-module';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { SearchService } from '../../services/search/search.service';
+import { SearchService } from '../../services/search-service/search.service';
 
 @Component({
   selector: 'app-navbar',
