@@ -168,7 +168,7 @@ export class BookList {
 
                 this.allBooksWithDetails.push(bookWithDetails);
 
-                // Update filtered books and pagination when we have all books
+                // Update filtered books and pagination
                 if (this.allBooksWithDetails.length === books.length) {
                   this.filteredBooksWithDetails = [...this.allBooksWithDetails];
                   this.resetPagination();
@@ -440,5 +440,21 @@ export class BookList {
 
     // Return original URL for local images
     return originalUrl;
+  }
+
+  // Dynamic rating UI
+  getStarType(rating: number) {
+    let starStates: ('star' | 'star_half' | 'star_outline')[] = [];
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= i) {
+        starStates.push('star'); // full
+      } else if (rating >= i - 0.5) {
+        starStates.push('star_half'); // half
+      } else {
+        starStates.push('star_outline'); // empty
+      }
+    }
+
+    return starStates;
   }
 }

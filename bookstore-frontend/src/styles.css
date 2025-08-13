@@ -9,6 +9,8 @@
   --contrast-color: #6997d0;
 
   --mat-chip-container-shape-radius: 5px;
+
+  --mat-button-tonal-container-color: var(--accent-color);
 }
 
 body {

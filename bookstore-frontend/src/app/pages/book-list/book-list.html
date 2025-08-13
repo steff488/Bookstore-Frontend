@@ -215,7 +215,8 @@
             height: 420px;
             padding: 10px;
             padding-top: 25px;
-            background: rgba(240, 233, 222, 0.9);
+            padding-bottom: 25px;
+            background: rgb(240, 233, 222);
             cursor: pointer;
           "
         >
@@ -237,12 +238,13 @@
             />
           </mat-card-header>
 
-          <mat-card-content style="padding: 8px">
+          <mat-card-content style="padding: 8px; height: 100%">
             <p
               style="
                 font-weight: 600;
                 font-size: 18px;
-                margin-bottom: 4px;
+                text-align: center;
+                margin-bottom: 0;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -254,23 +256,70 @@
             <p
               style="
                 font-size: 16px;
-                margin-bottom: 4px;
+                text-align: center;
+                margin-top: 4px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
               "
             >
-              {{book.authorName}}
+              {{ book.authorName }}
             </p>
 
-            <p style="font-size: 14px; margin-bottom: 4px">
-              Rating: {{ book.rating }}
-            </p>
-
-            <p style="font-size: 14px; margin-bottom: 4px">
-              {{ book.price }} lei
-            </p>
-
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+              "
+            >
+              <div style="display: flex; justify-content: center">
+                @for (icon of getStarType(book.rating); track $index) {
+                <mat-icon>{{ icon }}</mat-icon>
+                }
+                <p style="font-size: 16px; margin-left: 8px">
+                  ({{ book.rating }})
+                </p>
+              </div>
+              <div style="display: flex; gap: 10px">
+                <p
+                  style="
+                    flex: 1;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #c5160d;
+                    text-align: center;
+                    align-content: center;
+                    margin-bottom: 0;
+                  "
+                >
+                  {{ book.price }} lei
+                </p>
+                <!-- Stops the opening of bookDetails page-->
+                <button
+                  matButton="tonal"
+                  (click)="toggleCart(book.id); $event.stopPropagation()"
+                  style="
+                    flex: 1;
+                    padding-left: 0px;
+                    padding-right: 0px;
+                    color: var(--secondary-color);
+                    border-radius: 5px !important;
+                    height: 32px;
+                  "
+                >
+                  <mat-icon
+                    style="
+                      margin: 0;
+                      font-size: 24px;
+                      height: 20px;
+                      width: 32px;
+                    "
+                    >{{ getCartButtonText(book.id) }}</mat-icon
+                  >
+                </button>
+              </div>
+            </div>
             <!-- Stops the opening of bookDetails page-->
             <button
               mat-icon-button
@@ -284,19 +333,6 @@
               "
             >
               <mat-icon>{{ getFavoriteButtonText(book.id) }}</mat-icon>
-            </button>
-            <!-- Stops the opening of bookDetails page-->
-            <button
-              mat-icon-button
-              (click)="toggleCart(book.id); $event.stopPropagation()"
-              style="
-                position: absolute;
-                top: 57px;
-                right: 5px;
-                color: var(--secondary-color);
-              "
-            >
-              <mat-icon>{{ getCartButtonText(book.id) }}</mat-icon>
             </button>
           </mat-card-content>
         </mat-card>
