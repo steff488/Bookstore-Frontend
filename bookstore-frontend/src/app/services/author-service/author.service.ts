@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Author } from '../../models/author';
 
 @Injectable({
@@ -8,6 +8,9 @@ import { Author } from '../../models/author';
 })
 export class AuthorService {
   private apiUrl = 'http://localhost:8080/api/authors';
+
+  private authorBehaviorSubject = new BehaviorSubject<Author[]>([]);
+  authors = this.authorBehaviorSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -18,12 +21,32 @@ export class AuthorService {
 
   // 2. Get all authors
   getAuthors(): Observable<Author[]> {
-    return this.http.get<Author[]>(this.apiUrl);
+    // Return cached authors if possible
+    if (this.authorBehaviorSubject.value.length > 0) {
+      return of(this.authorBehaviorSubject.value);
+    }
+    // Otherwise, fetch from API and cache
+    return this.http
+      .get<Author[]>(this.apiUrl)
+      .pipe(tap((authors) => this.authorBehaviorSubject.next(authors)));
   }
 
   // 3. Get author by id
-  getAuthorById(id: number): Observable<Author> {
-    return this.http.get<Author>(`${this.apiUrl}/${id}`);
+  getAuthorById(id: number): Observable<Author | undefined> {
+    // Try to get author from cache first
+    if (this.authorBehaviorSubject.value.length > 0) {
+      const author = this.authorBehaviorSubject.value.find((a) => a.id === id);
+      return of(author);
+    }
+    // If not cached, get it from the API and cache
+    return this.http.get<Author>(`${this.apiUrl}/${id}`).pipe(
+      tap((fetchedAuthor) => {
+        this.authorBehaviorSubject.next([
+          ...this.authorBehaviorSubject.value,
+          fetchedAuthor,
+        ]);
+      })
+    );
   }
 
   // 4. Update an author

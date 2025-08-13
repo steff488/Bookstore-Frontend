@@ -1,9 +1,9 @@
 import { Component, ElementRef, HostListener, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BookService } from '../../services/book-service/book.service';
-import { Book } from '../../models/book';
 import { CategoryService } from '../../services/category-service/category.service';
 import { Category } from '../../models/category';
+import { AuthorService } from '../../services/author-service/author.service';
 import { BookFilters } from '../../models/bookFilters';
 import { FavoriteItemService } from '../../services/favoriteItem-service/favorite-item.service';
 import { FavoriteItem } from '../../models/favoriteItem';
@@ -19,7 +19,17 @@ import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { RouterModule } from '@angular/router';
 import { SearchService } from '../../services/search-service/search.service';
 import { FilterService } from '../../services/filter-service/filter-service';
-import { L, M } from '@angular/cdk/keycodes';
+
+interface BookWithDetails {
+  id: number;
+  title: string;
+  authorName: string;
+  categoryId: number;
+  price: number;
+  rating: number;
+  pageCount: number;
+  coverImageUrl: string;
+}
 
 @Component({
   selector: 'app-book-list',
@@ -38,12 +48,13 @@ import { L, M } from '@angular/cdk/keycodes';
 export class BookList {
   userId!: number;
 
-  // For pagination
-  books!: Observable<Book[]>;
+  allBooksWithDetails: BookWithDetails[] = [];
+  filteredBooksWithDetails: BookWithDetails[] = [];
   categories!: Observable<Category[]>;
 
-  allBooks: Book[] = [];
-  pageSize = 25;
+  // For pagination - using the interface
+  paginatedBooks!: Observable<BookWithDetails[]>;
+  pageSize = 24;
   currentPage = 0;
 
   favoriteItems: FavoriteItem[] = [];
@@ -53,18 +64,17 @@ export class BookList {
   scrollY = 0;
   isScrolledToTop = true;
 
-  toolbar = viewChild<ElementRef>('toolbar');
-  paginator = viewChild<MatPaginator>('paginator'); // Add this line
-  isSticky = false;
-
   searchQuery = '';
-  filteredBooks = this.allBooks;
+  sortOption = 'noOrder';
 
-  sortOption = '';
+  toolbar = viewChild<ElementRef>('toolbar');
+  paginator = viewChild<MatPaginator>('paginator');
+  isSticky = false;
 
   constructor(
     private bookService: BookService,
     private categoryService: CategoryService,
+    private authorService: AuthorService,
     private favoriteItemService: FavoriteItemService,
     private cartItemService: CartItemService,
     private searchService: SearchService,
@@ -99,21 +109,86 @@ export class BookList {
     // const urserIdStr = localStorage.getItem('userId');
     const userIdStr = 1;
     if (!userIdStr) {
-      console.error('book-list: UserId not found in localStorage');
+      console.error('book-list: UserId not found');
       return;
     }
 
     this.userId = Number(userIdStr);
 
-    this.books = this.bookService.getBooks();
+    // Load categories
     this.categories = this.categoryService.getCategories();
 
-    this.bookService.getBooks().subscribe((books) => {
-      this.allBooks = books;
-      this.filteredBooks = books;
-      this.resetPagination();
+    // Load authors into cache first, then load books
+    this.loadAuthorsIntoCache();
+    this.loadBooksWithDetails();
+
+    // Load user's favorites and cart items
+    this.loadUserData();
+
+    this.filterService.currentFilters.subscribe((filters) => {
+      this.applySearchAndFilters(this.searchQuery, filters);
     });
 
+    this.searchService.currentSearchQuery.subscribe((searchQuery) => {
+      this.applySearchAndFilters(searchQuery);
+    });
+  }
+
+  // Load all authors into cache first
+  loadAuthorsIntoCache(): void {
+    this.authorService.getAuthors().subscribe({
+      next: (authors) => {
+        console.log('Authors loaded into cache:', authors.length);
+      },
+      error: (err) => console.error('Failed to load authors into cache:', err),
+    });
+  }
+
+  // Load books and combine with author data
+  loadBooksWithDetails(): void {
+    this.bookService.getBooks().subscribe({
+      next: (books) => {
+        console.log('Books loaded:', books.length);
+
+        // For each book, get the author and create BookWithDetails
+        books.forEach((book) => {
+          this.authorService.getAuthorById(Number(book.authorId)).subscribe({
+            next: (author) => {
+              if (author) {
+                const bookWithDetails: BookWithDetails = {
+                  id: book.id,
+                  title: book.title,
+                  authorName: author.name,
+                  categoryId: Number(book.categoryId),
+                  price: book.price,
+                  rating: book.rating,
+                  pageCount: book.pageCount,
+                  coverImageUrl: book.coverImageUrl,
+                };
+
+                this.allBooksWithDetails.push(bookWithDetails);
+
+                // Update filtered books and pagination when we have all books
+                if (this.allBooksWithDetails.length === books.length) {
+                  this.filteredBooksWithDetails = [...this.allBooksWithDetails];
+                  this.resetPagination();
+                  console.log(
+                    'All books with authors loaded:',
+                    this.allBooksWithDetails.length
+                  );
+                }
+              }
+            },
+            error: (err) => console.error('Failed to fetch author:', err),
+          });
+        });
+      },
+      error: (err) => console.error('Failed to load books:', err),
+    });
+  }
+
+  // Load user favorites and cart items
+  loadUserData(): void {
     this.favoriteItemService.getAllByUserId(this.userId).subscribe({
       next: (items) => {
         this.favoriteItems = items;
@@ -127,24 +202,13 @@ export class BookList {
       },
       error: (err) => console.error('Failed to load cart items:', err),
     });
-
-    // Get books from searchService
-    this.searchService.currentSearchQuery.subscribe((query) => {
-      this.applySearchAndFilters(query);
-    });
-
-    // Get books from filterService
-    this.filterService.currentFilters.subscribe((filters) => {
-      this.applySearchAndFilters(this.searchQuery, filters);
-    });
   }
 
-  private applySearchAndFilters(searchQuery = '', filters?: BookFilters) {
-    // Close the sidebar when applying filters
+  applySearchAndFilters(searchQuery = '', filters?: BookFilters) {
     this.sideNavOpened = false;
-
     this.searchQuery = searchQuery;
-    this.filteredBooks = this.allBooks.filter((book) => {
+
+    this.filteredBooksWithDetails = this.allBooksWithDetails.filter((book) => {
       let matchesSearch = true;
       let matchesCategory = true;
       let matchesPrice = true;
@@ -159,14 +223,15 @@ export class BookList {
 
       if (filters) {
         if (filters.categoryIds?.length) {
-          matchesCategory = filters.categoryIds.includes(
-            Number(book.categoryId)
-          );
+          matchesCategory = filters.categoryIds.includes(book.categoryId);
         }
 
-        if (filters.maxPrice && filters.minPrice) {
-          matchesPrice =
-            book.price >= filters.minPrice && book.price <= filters.maxPrice;
+        if (filters.minPrice) {
+          matchesPrice = matchesPrice && book.price >= filters.minPrice;
+        }
+
+        if (filters.maxPrice) {
+          matchesPrice = matchesPrice && book.price <= filters.maxPrice;
         }
 
         if (filters.maxPages) {
@@ -177,6 +242,7 @@ export class BookList {
           matchesRating = book.rating >= filters.minRating;
         }
       }
+
       return (
         matchesSearch &&
         matchesCategory &&
@@ -185,7 +251,7 @@ export class BookList {
         matchesRating
       );
     });
-    // Reset pagination when search changes
+
     this.resetPagination();
   }
 
@@ -194,26 +260,23 @@ export class BookList {
     this.currentPage = event.pageIndex;
     this.updatePagedBooks();
   }
-
   updatePagedBooks() {
     const startIndex = this.currentPage * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    const paged = this.filteredBooks.slice(startIndex, endIndex);
-    this.books = of(paged);
+    const paged = this.filteredBooksWithDetails.slice(startIndex, endIndex);
+    this.paginatedBooks = of(paged);
   }
 
-  // Helper method to reset pagination
   private resetPagination() {
     this.currentPage = 0;
     const paginator = this.paginator();
     if (paginator) {
-      paginator.pageIndex = 0; // Reset the paginator's page index
+      paginator.pageIndex = 0;
     }
     this.updatePagedBooks();
   }
 
-  // Checks is a book is a favorite for a certain userId
-  // (favoriteItems contain only books related to the passed userId)
+  // Book interaction methods
   isBookFavorite(bookId: number): boolean {
     return this.favoriteItems.some((item) => item.bookId === bookId);
   }
@@ -223,13 +286,13 @@ export class BookList {
   }
 
   getFavoriteButtonText(bookId: number): string {
-    return this.isBookFavorite(bookId)
-      ? 'Remove from favorites'
-      : 'Add to favorites';
+    return this.isBookFavorite(bookId) ? 'favorite' : 'favorite_border';
   }
 
   getCartButtonText(bookId: number): string {
-    return 'Add to cart';
+    return this.isBookInCart(bookId)
+      ? 'remove_shopping_cart'
+      : 'add_shopping_cart';
   }
 
   toggleFavorite(bookId: number): void {
@@ -237,6 +300,14 @@ export class BookList {
       this.removeFromFavorites(bookId);
     } else {
       this.addToFavorites(bookId);
+    }
+  }
+
+  toggleCart(bookId: number): void {
+    if (this.isBookInCart(bookId)) {
+      this.removeFromCart(bookId);
+    } else {
+      this.addToCart(bookId);
     }
   }
 
@@ -274,24 +345,6 @@ export class BookList {
   }
 
   addToCart(bookId: number): void {
-    // Check if item already exists in cart
-    const existingCartItem = this.cartItems.find(
-      (item) => item.bookId === bookId
-    );
-
-    if (existingCartItem) {
-      // Item exists, increment quantity
-      this.updateCartQuantity(
-        existingCartItem.id!,
-        existingCartItem.quantity + 1
-      );
-    } else {
-      // Item doesn't exist, add new item
-      this.createNewCartItem(bookId);
-    }
-  }
-
-  private createNewCartItem(bookId: number): void {
     const cartItem: CartItem = {
       bookId: bookId,
       userId: this.userId,
@@ -307,54 +360,85 @@ export class BookList {
     });
   }
 
-  private updateCartQuantity(cartItemId: number, newQuantity: number): void {
-    const existingItem = this.cartItems.find((item) => item.id === cartItemId);
+  removeFromCart(bookId: number) {
+    const cartItem = this.cartItems.find(
+      (item) => item.bookId === bookId && item.userId === this.userId
+    );
 
-    if (!existingItem) return;
+    if (!cartItem?.id) return;
 
-    const updatedCartItem: CartItem = {
-      ...existingItem,
-      quantity: newQuantity,
-    };
-
-    this.cartItemService.updateCartItem(cartItemId, updatedCartItem).subscribe({
-      next: (updatedItem) => {
-        this.cartItems = this.cartItems.map((item) =>
-          item.id === cartItemId ? { ...item, quantity: newQuantity } : item
+    this.cartItemService.deleteCartItem(cartItem.id).subscribe({
+      next: () => {
+        this.cartItems = this.cartItems.filter(
+          (item) => item.id !== cartItem.id
         );
-        console.log(`Cart quantity updated to ${newQuantity}`);
+        console.log('Removed from cart');
       },
-      error: (err) => console.error('Failed to update cart quantity:', err),
+      error: (err) => console.error('Failed to remove cart:', err),
     });
   }
 
   onSearch() {
     if (this.searchQuery.trim()) {
-      this.bookService.searchBooks(this.searchQuery).subscribe((data) => {
-        this.allBooks = data;
-        this.filteredBooks = data;
-        this.resetPagination(); // Use helper method
+      this.bookService.searchBooks(this.searchQuery).subscribe((books) => {
+        books.forEach((book, index) => {
+          this.authorService.getAuthorById(Number(book.authorId)).subscribe({
+            next: (author) => {
+              if (author) {
+                const bookWithDetails: BookWithDetails = {
+                  id: book.id,
+                  title: book.title,
+                  authorName: author.name,
+                  categoryId: Number(book.categoryId),
+                  price: book.price,
+                  pageCount: book.pageCount,
+                  rating: book.rating,
+                  coverImageUrl: book.coverImageUrl,
+                };
+
+                this.allBooksWithDetails.push(bookWithDetails);
+                this.filteredBooksWithDetails = [...this.allBooksWithDetails];
+                this.resetPagination();
+              }
+            },
+          });
+        });
       });
     } else {
       // If the search query is empty, reset
-      this.bookService.getBooks().subscribe((books) => {
-        this.allBooks = books;
-        this.filteredBooks = books;
-        this.resetPagination(); // Use helper method
-      });
+      this.filteredBooksWithDetails = [...this.allBooksWithDetails];
+      this.resetPagination();
     }
   }
 
   applySort() {
-    this.filteredBooks.sort((a, b) => {
-      if (this.sortOption == 'priceAsc') {
-        return a.price - b.price;
-      } else if (this.sortOption == 'priceDesc') {
-        return b.price - a.price;
-      }
-      return 0;
-    });
-
+    if (this.sortOption == 'noOrder') {
+      this.filteredBooksWithDetails = [...this.allBooksWithDetails];
+    } else {
+      this.filteredBooksWithDetails.sort((a, b) => {
+        if (this.sortOption == 'priceAsc') {
+          return a.price - b.price;
+        } else if (this.sortOption == 'priceDesc') {
+          return b.price - a.price;
+        }
+        return 0;
+      });
+    }
     this.resetPagination();
+  }
+
+  // Fully AI generated function
+  getOptimizedImageUrl(originalUrl: string): string {
+    // Check if it's a Cloudinary URL
+    if (originalUrl && originalUrl.includes('cloudinary.com')) {
+      // Insert transformation parameters to resize to 256x390 (2x the display size for retina)
+      return originalUrl.replace(
+        '/upload/',
+        '/upload/w_256,h_390,c_fill,f_auto,q_auto/'
+      );
+    }
+
+    // Return original URL for local images
+    return originalUrl;
   }
 }

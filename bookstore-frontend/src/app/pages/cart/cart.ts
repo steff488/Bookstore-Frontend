@@ -4,11 +4,18 @@ import { MaterialModule } from '../../material/material-module';
 import { CartItemService } from '../../services/cartItem-service/cartItem.service';
 import { CartItem } from '../../models/cartItem';
 import { BookService } from '../../services/book-service/book.service';
-import { Book } from '../../models/book';
 import { Navbar } from '../../components/navbar/navbar';
-import { Author } from '../../models/author';
 import { AuthorService } from '../../services/author-service/author.service';
 import { RouterModule } from '@angular/router';
+
+interface CartItemWithDetails {
+  id: number;
+  bookId: number;
+  bookTitle: string;
+  authorName: string;
+  price: number;
+  quantity: number;
+}
 
 @Component({
   selector: 'app-cart',
@@ -18,10 +25,7 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule, MaterialModule, Navbar],
 })
 export class Cart implements OnInit {
-  cartItems: CartItem[] = [];
-  books: Book[] = [];
-  authors: Author[] = [];
-
+  cartItems: CartItemWithDetails[] = [];
   total: number = 0;
 
   constructor(
@@ -31,27 +35,60 @@ export class Cart implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    //const userId = Number(localStorage.getItem('userId'));
     const userId = 1;
+    this.loadAuthorsIntoCache();
+    this.loadCartItems(userId);
+  }
 
+  /*==================== LOAD AUTHORS INTO CACHE ====================*/
+  loadAuthorsIntoCache(): void {
+    this.authorService.getAuthors().subscribe({
+      next: (authors) => {
+        console.log('Authors loaded into cache:', authors.length);
+      },
+      error: (err) => console.error('Failed to load authors into cache:', err),
+    });
+  }
+
+  /*==================== LOAD CART ITEMS ====================*/
+  loadCartItems(userId: number): void {
     this.cartItemService.getAllByUserId(userId).subscribe({
       next: (cartItems) => {
-        this.cartItems = cartItems;
+        console.log('Cart items loaded:', cartItems.length);
 
+        // Load book for each cartItem
         cartItems.forEach((cartItem) => {
           this.bookService.getBookById(cartItem.bookId).subscribe({
             next: (book) => {
-              this.books.push(book);
+              console.log('Book loaded:', book.title);
 
-              // Load author for this book
+              // Load author for this book (from cache)
               this.authorService
                 .getAuthorById(Number(book.authorId))
                 .subscribe({
                   next: (author) => {
-                    this.authors.push(author);
-                    // Recompute total after each book is loaded
-                    // (this is neccessary because of the async)
-                    this.computeTotal();
+                    if (cartItem.id && author) {
+                      console.log('Author loaded:', author.name);
+
+                      const item: CartItemWithDetails = {
+                        id: cartItem.id,
+                        bookId: book.id,
+                        bookTitle: book.title,
+                        authorName: author.name,
+                        price: book.price,
+                        quantity: cartItem.quantity,
+                      };
+
+                      this.cartItems.push(item);
+                      this.computeTotal();
+
+                      console.log('Cart item created:', item);
+                    } else {
+                      console.error('Missing cart item id or author data', {
+                        cartItemId: cartItem.id,
+                        author: author,
+                      });
+                    }
                   },
                   error: (err) => console.error('Failed to fetch author:', err),
                 });
@@ -64,49 +101,20 @@ export class Cart implements OnInit {
     });
   }
 
+  /*==================== COMPUTE CART TOTAL ====================*/
   private computeTotal(): void {
     this.total = 0;
 
-    // Go through each cart item
     this.cartItems.forEach((cartItem) => {
-      // Find the matching book for this cart item
-      const book = this.books.find((b) => b.id === cartItem.bookId);
-
-      if (book) {
-        this.total += cartItem.quantity * book.price;
-      }
+      this.total += cartItem.quantity * cartItem.price;
     });
 
     // Round to 2 decimal places
     this.total = Math.round(this.total * 100) / 100;
+    console.log('Total computed:', this.total);
   }
 
-  // Helper method to format total for display
-  getFormattedTotal(): string {
-    return this.total.toFixed(2);
-  }
-
-  // Helper method to find book by bookId
-  getBookById(bookId: number): Book | null {
-    const book = this.books.find((b) => b.id === bookId);
-    return book || null;
-  }
-
-  // Helper method to find author by authorId
-  getAuthorById(authorId: number): Author | null {
-    const author = this.authors.find((a) => a.id === authorId);
-    return author || null;
-  }
-
-  // Helper method to get author name for a book
-  getAuthorNameForBook(bookId: number): string {
-    const book = this.getBookById(bookId);
-    if (!book) return 'Unknown Book';
-
-    const author = this.getAuthorById(Number(book.authorId));
-    return author ? author.name : 'Unknown Author';
-  }
-
+  /*==================== REMOVE FROM CART ====================*/
   removeFromCart(cartItemId: number): void {
     this.cartItemService.deleteCartItem(cartItemId).subscribe({
       next: () => {
@@ -115,18 +123,7 @@ export class Cart implements OnInit {
           (item) => item.id !== cartItemId
         );
 
-        // Find the cart item that was removed to get its bookId
-        const removedCartItem = this.cartItems.find(
-          (item) => item.id === cartItemId
-        );
-        if (removedCartItem) {
-          // Remove the corresponding book from books array
-          this.books = this.books.filter(
-            (book) => book.id !== removedCartItem.bookId
-          );
-        }
-
-        // Recalculate total
+        // Recompute total
         this.computeTotal();
 
         console.log('Removed from cart');
@@ -135,8 +132,8 @@ export class Cart implements OnInit {
     });
   }
 
+  /*==================== DECREMENT CART ITEM QUANTITY ====================*/
   decrementCartItemQuantity(cartItemId: number): void {
-    // Find the current cart item
     const existingItem = this.cartItems.find((item) => item.id === cartItemId);
 
     if (!existingItem) {
@@ -150,28 +147,28 @@ export class Cart implements OnInit {
     }
 
     const updatedItem: CartItem = {
-      ...existingItem,
+      id: existingItem.id,
+      bookId: existingItem.bookId,
+      userId: 1,
       quantity: existingItem.quantity - 1,
     };
 
     this.cartItemService.updateCartItem(cartItemId, updatedItem).subscribe({
       next: () => {
-        // Update the cart item in the array
-        this.cartItems = this.cartItems.map((item) =>
-          item.id === cartItemId ? updatedItem : item
-        );
+        // Update the existing item
+        existingItem.quantity = existingItem.quantity - 1;
 
-        // Recalculate total
+        // Recompute total
         this.computeTotal();
 
-        console.log('Decremented quantity to', updatedItem.quantity);
+        console.log('Decremented quantity to', existingItem.quantity);
       },
       error: (err) => console.error('Failed to decrement quantity:', err),
     });
   }
 
+  /*==================== INCREMENT CART ITEM QUANTITY ====================*/
   incrementCartItemQuantity(cartItemId: number): void {
-    // Find the current cart item
     const existingItem = this.cartItems.find((item) => item.id === cartItemId);
 
     if (!existingItem) {
@@ -180,21 +177,21 @@ export class Cart implements OnInit {
     }
 
     const updatedItem: CartItem = {
-      ...existingItem,
+      id: existingItem.id,
+      bookId: existingItem.bookId,
+      userId: 1,
       quantity: existingItem.quantity + 1,
     };
 
     this.cartItemService.updateCartItem(cartItemId, updatedItem).subscribe({
       next: () => {
-        // Update the cart item in the array
-        this.cartItems = this.cartItems.map((item) =>
-          item.id === cartItemId ? updatedItem : item
-        );
+        // Update the existing item
+        existingItem.quantity = existingItem.quantity + 1;
 
-        // Recalculate total
+        // Recompute total
         this.computeTotal();
 
-        console.log('Incremented quantity to', updatedItem.quantity);
+        console.log('Incremented quantity to', existingItem.quantity);
       },
       error: (err) => console.error('Failed to increment quantity:', err),
     });

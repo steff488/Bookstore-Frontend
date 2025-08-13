@@ -28,7 +28,6 @@
     );
   "
 >
-  @if (cartItems) {
   <section style="flex: 2">
     <section
       class="custom-font"
@@ -51,9 +50,8 @@
       <div style="flex: 2; text-align: center">Price</div>
       <div style="flex: 1; text-align: right">Remove</div>
     </section>
-
-    @for (cartItem of cartItems; track cartItem.id) { @for (book of books; track
-    book.id) { @if(book.id === cartItem.bookId) {
+    @if (cartItems.length > 0) { @for (cartItem of cartItems; track cartItem.id)
+    {
 
     <div
       style="
@@ -73,18 +71,18 @@
       <section style="flex: 4; display: flex; flex-direction: row">
         <img
           mat-card-image
-          [routerLink]="['/books', book.id]"
+          [routerLink]="['/books', cartItem.bookId]"
           role="button"
           src="assets/book.png"
-          alt="{{ book.title }} cover"
+          alt="{{ cartItem.bookTitle }} cover"
           style="height: 100%; object-fit: cover; margin-right: 20px"
         />
         <div style="align-content: center">
           <div style="font-family: 'Roboto'; font-weight: 500; font-size: 25px">
-            {{ book.title }}
+            {{ cartItem.bookTitle }}
           </div>
           <div style="font-family: 'Roboto'; font-size: 18px">
-            {{ getAuthorNameForBook(book.id) }}
+            {{ cartItem.authorName }}
           </div>
         </div>
       </section>
@@ -139,7 +137,7 @@
       <!--  PRICE-->
       <section style="flex: 2; align-content: center; font-size: 18px">
         <div class="custom-font" style="text-align: center">
-          {{ (book.price * cartItem.quantity) | number: '1.2-2' }} lei
+          {{ (cartItem.price * cartItem.quantity) | number: '1.2-2' }} lei
         </div>
       </section>
       <!--  END PRICE -->
@@ -169,7 +167,7 @@
       </section>
       <!--  END REMOVE BUTTON -->
     </div>
-    }}}
+    } }
   </section>
 
   <!--  CART INFO SECTION  -->
@@ -205,7 +203,12 @@
         Cost of products:
         <span class="custom-font">{{ total | number:'1.2-2' }} lei</span>
       </div>
-      <div>Delivery cost: <span class="custom-font">15.00 lei</span></div>
+      <div>
+        Delivery cost:
+        <span class="custom-font"
+          >{{ cartItems.length > 0 ? '15.00 lei' : '0 lei'}}</span
+        >
+      </div>
       <div
         style="
           display: flex;
@@ -215,7 +218,8 @@
         "
       >
         <div class="custom-font" style="align-self: center; font-size: 20px">
-          Total: {{ (total + 15) | number:'1.2-2' }} lei
+          Total: {{ (cartItems.length > 0 ? (total + 15) : (total + 0)) |
+          number:'1.2-2' }} lei
         </div>
         <button
           mat-stroked-button
@@ -229,5 +233,4 @@
     </div>
   </section>
   <!--  END CART INFO SECTION  -->
-  }
 </div>
