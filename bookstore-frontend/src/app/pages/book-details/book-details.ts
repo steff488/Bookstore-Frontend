@@ -9,6 +9,22 @@ import { CartItemService } from '../../services/cartItem-service/cartItem.servic
 import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../../material/material-module';
 import { Navbar } from '../../components/navbar/navbar';
+import { AuthorService } from '../../services/author-service/author.service';
+import { CategoryService } from '../../services/category-service/category.service';
+
+interface BookWithDetails {
+  id: number;
+  title: string;
+  authorName: string;
+  categoryName: string;
+  price: number;
+  rating: number;
+  pageCount: number;
+  description: string;
+  stock: number;
+  coverImageUrl: string;
+  publicationDate: string;
+}
 
 @Component({
   selector: 'app-book-details',
@@ -20,6 +36,7 @@ import { Navbar } from '../../components/navbar/navbar';
 export class BookDetails implements OnInit {
   bookId!: number;
   book!: Book;
+  bookWithDetails!: BookWithDetails;
 
   favoriteItems: FavoriteItem[] = [];
   cartItems: CartItem[] = [];
@@ -27,18 +44,72 @@ export class BookDetails implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private bookService: BookService,
+    private authorService: AuthorService,
+    private categoryService: CategoryService,
     private favoriteItemService: FavoriteItemService,
     private cartItemService: CartItemService
   ) {}
-
   ngOnInit(): void {
     this.bookId = Number(this.route.snapshot.paramMap.get('id'));
 
     this.bookService.getBookById(this.bookId).subscribe({
-      next: (data) => (this.book = data),
+      next: (book) => {
+        this.book = book;
+
+        // Initial bookWithDetails with placeholders
+        this.bookWithDetails = {
+          id: book.id,
+          title: book.title,
+          authorName: 'Loading...',
+          categoryName: 'Loading...',
+          price: book.price,
+          rating: book.rating,
+          pageCount: book.pageCount,
+          description: book.description,
+          stock: book.stock,
+          coverImageUrl: book.coverImageUrl,
+          publicationDate: book.publicationDate,
+        };
+
+        // Load author and category names
+        this.loadAuthorName(book.authorId);
+        this.loadCategoryName(book.categoryId);
+      },
       error: (err) => console.error('Failed to load book:', err),
     });
 
+    this.loadFavoritesAndCart();
+  }
+
+  // Load author name
+  private loadAuthorName(authorId: number): void {
+    this.authorService.getAuthorById(authorId).subscribe({
+      next: (author) => {
+        this.bookWithDetails.authorName = author?.name || 'Unknown Author';
+      },
+      error: (err) => {
+        console.error('Failed to load author:', err);
+        this.bookWithDetails.authorName = 'Unknown Author';
+      },
+    });
+  }
+
+  // Load category name
+  private loadCategoryName(categoryId: number): void {
+    this.categoryService.getCategoryById(categoryId).subscribe({
+      next: (category) => {
+        this.bookWithDetails.categoryName =
+          category?.name || 'Unknown Category';
+      },
+      error: (err) => {
+        console.error('Failed to load category:', err);
+        this.bookWithDetails.categoryName = 'Unknown Category';
+      },
+    });
+  }
+
+  // Load favorites and cart
+  private loadFavoritesAndCart(): void {
     this.favoriteItemService.getFavoriteItems().subscribe({
       next: (items) => {
         this.favoriteItems = items;
@@ -62,6 +133,16 @@ export class BookDetails implements OnInit {
     return this.cartItems.some((item) => item.bookId === bookId);
   }
 
+  getFavoriteIcon(bookId: number): string {
+    return this.isBookFavorite(bookId) ? 'favorite' : 'favorite_border';
+  }
+
+  getCartIcon(bookId: number): string {
+    return this.isBookInCart(bookId)
+      ? 'remove_shopping_cart'
+      : 'add_shopping_cart';
+  }
+
   getFavoriteButtonText(bookId: number): string {
     return this.isBookFavorite(bookId)
       ? 'Remove from favorites'
@@ -69,7 +150,7 @@ export class BookDetails implements OnInit {
   }
 
   getCartButtonText(bookId: number): string {
-    return 'Add to cart';
+    return this.isBookInCart(bookId) ? 'Remove from cart' : 'Add to cart';
   }
 
   toggleFavorite(bookId: number): void {
@@ -113,25 +194,15 @@ export class BookDetails implements OnInit {
     });
   }
 
-  addToCart(bookId: number): void {
-    // Check if item already exists in cart
-    const existingCartItem = this.cartItems.find(
-      (item) => item.bookId === bookId && item.userId === 1
-    );
-
-    if (existingCartItem) {
-      // Item exists, increment quantity
-      this.updateCartQuantity(
-        existingCartItem.id!,
-        existingCartItem.quantity + 1
-      );
+  toggleCart(bookId: number): void {
+    if (this.isBookInCart(bookId)) {
+      this.removeFromCart(bookId);
     } else {
-      // Item doesn't exist, add new item
-      this.createNewCartItem(bookId);
+      this.addToCart(bookId);
     }
   }
 
-  private createNewCartItem(bookId: number): void {
+  private addToCart(bookId: number): void {
     const cartItem: CartItem = {
       bookId: bookId,
       userId: 1,
@@ -144,27 +215,6 @@ export class BookDetails implements OnInit {
         console.log('Book added to cart');
       },
       error: (err) => console.error('Failed to add to cart:', err),
-    });
-  }
-
-  private updateCartQuantity(cartItemId: number, newQuantity: number): void {
-    const existingItem = this.cartItems.find((item) => item.id === cartItemId);
-
-    if (!existingItem) return;
-
-    const updatedCartItem: CartItem = {
-      ...existingItem,
-      quantity: newQuantity,
-    };
-
-    this.cartItemService.updateCartItem(cartItemId, updatedCartItem).subscribe({
-      next: (updatedItem) => {
-        this.cartItems = this.cartItems.map((item) =>
-          item.id === cartItemId ? { ...item, quantity: newQuantity } : item
-        );
-        console.log(`Cart quantity updated to ${newQuantity}`);
-      },
-      error: (err) => console.error('Failed to update cart quantity:', err),
     });
   }
 
@@ -184,5 +234,21 @@ export class BookDetails implements OnInit {
       },
       error: (err) => console.error('Failed to remove from cart:', err),
     });
+  }
+
+  // Dynamic rating UI
+  getStarType(rating: number) {
+    let starStates: ('star' | 'star_half' | 'star_outline')[] = [];
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= i) {
+        starStates.push('star'); // full
+      } else if (rating >= i - 0.5) {
+        starStates.push('star_half'); // half
+      } else {
+        starStates.push('star_outline'); // empty
+      }
+    }
+
+    return starStates;
   }
 }

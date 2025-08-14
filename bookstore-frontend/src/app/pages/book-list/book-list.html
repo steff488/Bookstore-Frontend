@@ -150,6 +150,8 @@
       <option value="noOrder" selected>No order</option>
       <option value="priceAsc">Price ascending</option>
       <option value="priceDesc">Price descending</option>
+      <option value="ratingAsc">Rating ascending</option>
+      <option value="ratingDesc">Rating descending</option>
     </select>
   </form>
   <!--  END ORDER BY  -->
@@ -176,7 +178,7 @@
         box-shadow: 0px 3px 7px rgba(25, 18, 7, 0.3);
       "
     ></section>
-    <!--  SECTION FOR BOX SHADOW  -->
+    <!--  END SECTION FOR BOX SHADOW  -->
     <app-sidebar-content></app-sidebar-content>
   </mat-sidenav>
   <!-- END SIDEBAR  -->
@@ -207,7 +209,7 @@
         @if (paginatedBooks | async; as currentPageBooks) { @for (book of
         currentPageBooks; track book.id) {
         <mat-card
-          (click)="openBookDetails(book.id)"
+          [routerLink]="['/books', book.id]"
           style="
             border: 1px solid var(--primary-color);
             border-radius: 4px;

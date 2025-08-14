@@ -2,25 +2,131 @@
 <app-navbar [showSearch]="false"></app-navbar>
 <!--  END NAVBAR  -->
 
-@if (book) {
-<div>
-  <img
-    [src]="book.coverImageUrl"
-    alt="{{ book.title }}"
-    class="mb-2 w-full h-48 object-cover rounded"
-  />
-  <h2>{{ book.title }}</h2>
-  <p><strong>Author:</strong> {{ book.authorId }}</p>
-  <p><strong>Author:</strong> {{ book.categoryId }}</p>
-  <p><strong>Price:</strong> ${{ book.price }}</p>
-  <p><strong>Stock::</strong> {{ book.stock }}</p>
-  <p><strong>Rating:</strong> {{ book.rating }}</p>
-  <p><strong>Description:</strong> {{ book.description }}</p>
-  <p><strong>Published on:</strong> {{ book.publicationDate }}</p>
-  <p><strong>Page count:</strong> {{ book.pageCount }}</p>
-  <button (click)="toggleFavorite(book.id)">
-    {{ getFavoriteButtonText(book.id) }}
-  </button>
-  <button (click)="addToCart(book.id)">Add to cart</button>
+<div
+  style="
+    position: sticky;
+    top: var(--navbar-height);
+    background-color: var(--accent-color);
+    height: 5px;
+    width: 100%;
+  "
+></div>
+
+<div
+  style="
+    background-color: var(--primary-color);
+    height: calc(100dvh - var(--navbar-height) - 5px);
+    top: var(--navbar-height);
+  "
+>
+  @if (bookWithDetails) {
+  <div
+    style="display: flex; gap: 50px; height: 100%; width: 100%; padding: 100px"
+  >
+    <img
+      [src]="bookWithDetails.coverImageUrl"
+      alt="{{ book.title }}"
+      style="
+        flex: 1;
+        height: 100%;
+        box-shadow: 0 2px 20px 3px rgba(40, 26, 11, 0.8);
+      "
+    />
+
+    <div style="flex: 2; padding: 16px">
+      <p
+        style="
+          font-family: 'Roboto';
+          font-weight: 600;
+          font-size: 28px;
+          margin-bottom: 0;
+        "
+      >
+        {{ bookWithDetails.title }}
+      </p>
+      <p style="font-size: 18px">by {{ bookWithDetails.authorName }}</p>
+
+      <mat-divider style="margin-top: 16px; margin-bottom: 16px"></mat-divider>
+
+      <div
+        style="
+          overflow: hidden;
+          display: -webkit-box;
+          text-align: justify;
+          -webkit-line-clamp: 8;
+          line-clamp: 8;
+          -webkit-box-orient: vertical;
+          line-height: 1.5;
+        "
+      >
+        <p style="margin-bottom: 0">{{ bookWithDetails.description }}</p>
+      </div>
+
+      <mat-divider style="margin-top: 16px; margin-bottom: 16px"></mat-divider>
+
+      <!--  RATING  -->
+      <div style="display: flex">
+        @for (icon of getStarType(book.rating); track $index) {
+        <mat-icon>{{ icon }}</mat-icon>
+        }
+        <p style="font-size: 16px; margin-left: 8px">({{ book.rating }})</p>
+      </div>
+      <!--  END RATING  -->
+
+      <p style="margin-bottom: 0; text-transform: capitalize">
+        <strong>Category:</strong> {{ bookWithDetails.categoryName }}
+      </p>
+      <p style="margin-bottom: 0">
+        <strong>Page count:</strong> {{ bookWithDetails.pageCount }}
+      </p>
+      <p style="margin-bottom: 0">
+        <strong>Published on:</strong> {{ bookWithDetails.publicationDate }}
+      </p>
+    </div>
+
+    <div style="flex: 1; display: flex; justify-content: center">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          padding: 16px;
+          background-color: var(--accent-color);
+        "
+      >
+        <p style="margin-bottom: 6px; font-size: 24px">
+          <strong> {{ bookWithDetails.price }} lei</strong>
+        </p>
+        <p
+          style="margin-bottom: 0; font-size: 18px"
+          [style.color]="bookWithDetails.stock > 0 ? '#007e0a' : '#cf190f'"
+        >
+          {{ bookWithDetails.stock > 0 ? 'In stock' : 'Out of stock' }}
+        </p>
+
+        <mat-divider
+          style="margin-top: 16px; margin-bottom: 16px"
+        ></mat-divider>
+
+        <button
+          mat-stroked-button
+          (click)="toggleFavorite(bookWithDetails.id)"
+          style="border-radius: 5px; margin-bottom: 16px; font-size: 16px"
+        >
+          <mat-icon>{{ getFavoriteIcon(bookWithDetails.id) }}</mat-icon>
+          {{ getFavoriteButtonText(bookWithDetails.id) }}
+        </button>
+
+        <button
+          mat-stroked-button
+          (click)="toggleCart(bookWithDetails.id)"
+          style="border-radius: 5px; font-size: 16px"
+        >
+          <mat-icon>{{ getCartIcon(bookWithDetails.id) }}</mat-icon>
+          {{ getCartButtonText(bookWithDetails.id) }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
 </div>
-}

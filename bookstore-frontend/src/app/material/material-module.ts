@@ -23,6 +23,7 @@ import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatBadgeModule } from '@angular/material/badge';
 
 const MaterialComponents = [MatButtonModule];
 
@@ -52,6 +53,7 @@ const MaterialComponents = [MatButtonModule];
     MatSliderModule,
     MatChipListbox,
     MatChipOption,
+    MatBadgeModule,
   ],
   exports: [
     MaterialComponents,
@@ -78,6 +80,7 @@ const MaterialComponents = [MatButtonModule];
     MatSliderModule,
     MatChipListbox,
     MatChipOption,
+    MatBadgeModule,
   ],
 })
 export class MaterialModule {}

@@ -82,13 +82,6 @@ export class BookList {
     private router: Router
   ) {}
 
-  openBookDetails(bookId: number) {
-    const url = this.router.serializeUrl(
-      this.router.createUrlTree(['/books', bookId])
-    );
-    window.open(url, '_blank');
-  }
-
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.scrollY = window.pageYOffset;
@@ -420,6 +413,10 @@ export class BookList {
           return a.price - b.price;
         } else if (this.sortOption == 'priceDesc') {
           return b.price - a.price;
+        } else if (this.sortOption == 'ratingAsc') {
+          return a.rating - b.rating;
+        } else if (this.sortOption == 'ratingDesc') {
+          return b.rating - a.rating;
         }
         return 0;
       });
