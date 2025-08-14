@@ -119,6 +119,7 @@
 
         <button
           mat-stroked-button
+          [disabled]="bookWithDetails.stock === 0"
           (click)="toggleCart(bookWithDetails.id)"
           style="border-radius: 5px; font-size: 16px"
         >

@@ -165,10 +165,6 @@ export class BookList {
                 if (this.allBooksWithDetails.length === books.length) {
                   this.filteredBooksWithDetails = [...this.allBooksWithDetails];
                   this.resetPagination();
-                  console.log(
-                    'All books with authors loaded:',
-                    this.allBooksWithDetails.length
-                  );
                 }
               }
             },

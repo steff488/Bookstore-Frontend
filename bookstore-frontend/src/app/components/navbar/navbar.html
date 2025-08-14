@@ -57,7 +57,10 @@
   </button>
 
   <button mat-icon-button aria-label="Cart" [routerLink]="['/cart']">
-    <mat-icon matBadge="5" style="color: var(--accent-color)"
+    <mat-icon
+      matBadge="5"
+      aria-hidden="false"
+      style="color: var(--accent-color)"
       >shopping_cart</mat-icon
     >
   </button>

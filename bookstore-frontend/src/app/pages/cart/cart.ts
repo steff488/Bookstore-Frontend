@@ -61,16 +61,12 @@ export class Cart implements OnInit {
         cartItems.forEach((cartItem) => {
           this.bookService.getBookById(cartItem.bookId).subscribe({
             next: (book) => {
-              console.log('Book loaded:', book.title);
-
               // Load author for this book (from cache)
               this.authorService
                 .getAuthorById(Number(book.authorId))
                 .subscribe({
                   next: (author) => {
                     if (cartItem.id && author) {
-                      console.log('Author loaded:', author.name);
-
                       const item: CartItemWithDetails = {
                         id: cartItem.id,
                         bookId: book.id,
@@ -111,7 +107,6 @@ export class Cart implements OnInit {
 
     // Round to 2 decimal places
     this.total = Math.round(this.total * 100) / 100;
-    console.log('Total computed:', this.total);
   }
 
   /*==================== REMOVE FROM CART ====================*/

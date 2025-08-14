@@ -3,7 +3,11 @@ import { MatButtonModule, MatMiniFabButton } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
+import {
+  MatFormFieldModule,
+  MatFormField,
+  MatLabel,
+} from '@angular/material/form-field';
 import {
   MatSidenav,
   MatSidenavContainer,
@@ -24,6 +28,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatStepperModule } from '@angular/material/stepper';
 
 const MaterialComponents = [MatButtonModule];
 
@@ -54,6 +59,8 @@ const MaterialComponents = [MatButtonModule];
     MatChipListbox,
     MatChipOption,
     MatBadgeModule,
+    MatFormFieldModule,
+    MatStepperModule,
   ],
   exports: [
     MaterialComponents,
@@ -81,6 +88,8 @@ const MaterialComponents = [MatButtonModule];
     MatChipListbox,
     MatChipOption,
     MatBadgeModule,
+    MatFormFieldModule,
+    MatStepperModule,
   ],
 })
 export class MaterialModule {}

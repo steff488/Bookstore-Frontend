@@ -72,16 +72,12 @@ export class Favorites {
         favoriteItems.forEach((favoriteItem) => {
           this.bookService.getBookById(favoriteItem.bookId).subscribe({
             next: (book) => {
-              console.log('Book loaded:', book.title);
-
               // Load author for this book (from cache)
               this.authorService
                 .getAuthorById(Number(book.authorId))
                 .subscribe({
                   next: (author) => {
                     if (favoriteItem.id && author) {
-                      console.log('Author loaded:', author.name);
-
                       const item: FavoriteItemWithDetails = {
                         id: favoriteItem.id,
                         userId: this.userId,
