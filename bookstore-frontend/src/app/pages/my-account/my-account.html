@@ -2,11 +2,37 @@
 <app-navbar [showSearch]="false"></app-navbar>
 <!--  END NAVBAR  -->
 
-@if (user | async; as user) {
-<div>
-  <h2>My Account</h2>
-  <p>{{user.userName}}</p>
-  <p>{{user.email}}</p>
-  <button>change passwod</button>
+<div
+  style="
+    position: sticky;
+    top: var(--navbar-height);
+    background-color: var(--accent-color);
+    height: 5px;
+    width: 100%;
+  "
+></div>
+
+<div
+  style="
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-height) - 5px);
+    padding: 25px;
+    background-color: var(--secondary-color);
+    background: radial-gradient(
+      circle at center,
+      #30220c 20%,
+      #27190b 60%,
+      #191207 90%
+    );
+    align-content: center;
+  "
+>
+  @if (user | async; as user) {
+  <div
+    style="font-size: 25px; color: var(--primary-color); justify-self: center"
+  >
+    <p>{{user.userName}}</p>
+    <p>{{user.email}}</p>
+  </div>
+  }
 </div>
-}

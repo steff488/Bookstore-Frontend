@@ -2,25 +2,59 @@
 <app-navbar [showSearch]="false"></app-navbar>
 <!--  END NAVBAR  -->
 
-@if (orders | async; as orders) {
-<div>
-  <h2>My Orders</h2>
-  @for (order of orders; track order.id) {
-  <div class="order-card">
-    <h3>Order id #{{ order.id }}</h3>
-    <p>Status: {{ order.status }}</p>
-    <p>Total: {{ order.totalPrice | currency }}</p>
-    <p>Created: {{ order.createdAt }}</p>
+<div
+  style="
+    position: sticky;
+    top: var(--navbar-height);
+    background-color: var(--accent-color);
+    height: 5px;
+    width: 100%;
+  "
+></div>
 
-    <ul>
-      @for (item of order.items; track item.id) {
-      <li>
-        Product: {{ item.id }}, Quantity: {{ item.quantity }}, Subtotal: {{
-        item.priceAtPurchase }} lei
-      </li>
-      }
-    </ul>
+<div
+  style="
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-height) - 5px);
+    padding: 25px;
+    background-color: var(--ssecondary-color);
+    background: radial-gradient(
+      circle at center,
+      #30220c 20%,
+      #27190b 60%,
+      #191207 90%
+    );
+    justify-items: center;
+  "
+>
+  @if (orders | async; as orders) { @for (order of orders; track order.id) {
+
+  <div
+    style="
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      width: 70%;
+      padding: 16px;
+      margin-bottom: 20px;
+    "
+  >
+    <div class="order-card">
+      <h3>
+        Order id #{{ order.id }}
+        <span style="font-size: 16px"> - {{ order.status }}</span>
+      </h3>
+      <p>Total: {{ order.totalPrice | currency }}</p>
+      <p>Created at: {{ order.createdAt }}</p>
+
+      <ul>
+        @for (item of order.items; track item.id) {
+        <li>
+          BookId: {{ item.id }}, Quantity: {{ item.quantity }}, Subtotal: {{
+          item.priceAtPurchase }} lei
+        </li>
+        }
+      </ul>
+    </div>
   </div>
-  }
+  }}
 </div>
-}
