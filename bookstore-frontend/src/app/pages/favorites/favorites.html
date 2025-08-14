@@ -1,6 +1,7 @@
 <!--  NAVBAR  -->
 <app-navbar [showSearch]="false"></app-navbar>
 <!--  END NAVBAR  -->
+
 <div
   style="
     position: sticky;
@@ -25,22 +26,98 @@
     );
   "
 >
-  @if (favoriteItems) { @for (favorite of favoriteItems; track favorite.id) {
-  <div
+  <section
+    class="custom-font"
     style="
-      background-color: var(--primary-color);
-      height: 150px;
-      width: 100%;
-      margin-bottom: 20px;
+      display: flex;
+      flex-direction: row;
+      width: 70%;
+      height: 50px;
+      align-items: center;
       justify-self: center;
-      border-radius: 6px;
+      padding-left: 20px;
+      padding-right: 20px;
+      background-color: var(--primary-color);
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 18px;
     "
   >
-    Book {{ favorite.bookId }}
-    <button (click)="removeFromFavorites(favorite.bookId)">
-      Remove from favorites
-    </button>
-    <button (click)="addToCart(favorite.bookId)">Add to cart</button>
+    <div style="flex: 2">Product information</div>
+    <div style="flex: 1; text-align: center">Price</div>
+    <div style="flex: 1; text-align: right">Remove</div>
+  </section>
+
+  @if (favoriteItems) { @for (favoriteItem of favoriteItems; track
+  favoriteItem.id) {
+  <div
+    style="
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      background-color: var(--primary-color);
+      height: 150px;
+      width: 70%;
+      padding: 20px;
+      margin-bottom: 20px;
+      justify-self: center;
+      border-radius: 5px;
+    "
+  >
+    <!--  BOOK INFORMATION  -->
+    <section style="flex: 2; display: flex; flex-direction: row">
+      <img
+        mat-card-image
+        [routerLink]="['/books', favoriteItem.bookId]"
+        role="button"
+        [src]="getOptimizedImageUrl(favoriteItem.coverImageUrl)"
+        alt="{{ favoriteItem.bookTitle }} cover"
+        style="
+          height: 100%;
+          object-fit: cover;
+          margin-right: 20px;
+          box-shadow: 0 2px 10px 3px rgba(40, 26, 11, 0.5);
+        "
+      />
+      <div style="align-content: center; padding-left: 10px">
+        <div style="font-family: 'Roboto'; font-weight: 500; font-size: 25px">
+          {{ favoriteItem.bookTitle }}
+        </div>
+        <div style="font-family: 'Roboto'; font-size: 18px">
+          {{ favoriteItem.authorName }}
+        </div>
+      </div>
+    </section>
+    <!--  END BOOK INFORMATION-->
+
+    <!--  PRICE-->
+    <section style="flex: 1; align-content: center; font-size: 18px">
+      <div class="custom-font" style="text-align: center">
+        {{ favoriteItem.price| number: '1.2-2' }} lei
+      </div>
+    </section>
+    <!--  END PRICE -->
+
+    <!--  REMOVE BUTTON -->
+    <section
+      style="
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      "
+    >
+      <button
+        mat-icon-button
+        aria-label="Clear"
+        (click)="removeFromFavorites(favoriteItem.id!)"
+        class="clear-icon"
+        style="background-color: transparent; border: none; margin-right: 10px"
+      >
+        <mat-icon style="margin-bottom: 3px">clear</mat-icon>
+      </button>
+    </section>
+    <!--  END REMOVE BUTTON -->
   </div>
   } }
 </div>

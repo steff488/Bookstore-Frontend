@@ -73,11 +73,16 @@
           mat-card-image
           [routerLink]="['/books', cartItem.bookId]"
           role="button"
-          src="assets/book.png"
+          [src]="getOptimizedImageUrl(cartItem.coverImageUrl)"
           alt="{{ cartItem.bookTitle }} cover"
-          style="height: 100%; object-fit: cover; margin-right: 20px"
+          style="
+            height: 100%;
+            object-fit: cover;
+            margin-right: 20px;
+            box-shadow: 0 2px 10px 3px rgba(40, 26, 11, 0.5);
+          "
         />
-        <div style="align-content: center">
+        <div style="align-content: center; padding-left: 10px">
           <div style="font-family: 'Roboto'; font-weight: 500; font-size: 25px">
             {{ cartItem.bookTitle }}
           </div>

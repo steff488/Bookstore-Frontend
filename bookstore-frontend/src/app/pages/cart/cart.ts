@@ -15,6 +15,7 @@ interface CartItemWithDetails {
   authorName: string;
   price: number;
   quantity: number;
+  coverImageUrl: string;
 }
 
 @Component({
@@ -77,12 +78,11 @@ export class Cart implements OnInit {
                         authorName: author.name,
                         price: book.price,
                         quantity: cartItem.quantity,
+                        coverImageUrl: book.coverImageUrl,
                       };
 
                       this.cartItems.push(item);
                       this.computeTotal();
-
-                      console.log('Cart item created:', item);
                     } else {
                       console.error('Missing cart item id or author data', {
                         cartItemId: cartItem.id,
@@ -118,7 +118,6 @@ export class Cart implements OnInit {
   removeFromCart(cartItemId: number): void {
     this.cartItemService.deleteCartItem(cartItemId).subscribe({
       next: () => {
-        // Remove from cartItems array
         this.cartItems = this.cartItems.filter(
           (item) => item.id !== cartItemId
         );
@@ -195,5 +194,20 @@ export class Cart implements OnInit {
       },
       error: (err) => console.error('Failed to increment quantity:', err),
     });
+  }
+
+  // Fully AI generated function
+  getOptimizedImageUrl(originalUrl: string): string {
+    // Check if it's a Cloudinary URL
+    if (originalUrl && originalUrl.includes('cloudinary.com')) {
+      // Insert transformation parameters to resize to 256x390 (2x the display size for retina)
+      return originalUrl.replace(
+        '/upload/',
+        '/upload/w_256,h_390,c_fill,f_auto,q_auto/'
+      );
+    }
+
+    // Return original URL for local images
+    return originalUrl;
   }
 }

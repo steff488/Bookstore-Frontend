@@ -34,3 +34,14 @@ body {
   font-family: "Roboto";
   font-weight: 500;
 }
+
+.clear-icon,
+.add-icon,
+.remove-icon {
+  color: var(--secondary-color);
+  text-shadow: 0 0 1px var(--secondary-color);
+}
+
+.clear-icon:hover {
+  color: red;
+}

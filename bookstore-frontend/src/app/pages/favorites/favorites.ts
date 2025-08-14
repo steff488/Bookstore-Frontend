@@ -7,6 +7,18 @@ import { FavoriteItem } from '../../models/favoriteItem';
 import { CartItemService } from '../../services/cartItem-service/cartItem.service';
 import { CartItem } from '../../models/cartItem';
 import { Navbar } from '../../components/navbar/navbar';
+import { AuthorService } from '../../services/author-service/author.service';
+import { BookService } from '../../services/book-service/book.service';
+
+interface FavoriteItemWithDetails {
+  id: number;
+  userId: number;
+  bookId: number;
+  bookTitle: string;
+  authorName: string;
+  price: number;
+  coverImageUrl: string;
+}
 
 @Component({
   selector: 'app-favorite',
@@ -18,12 +30,12 @@ import { Navbar } from '../../components/navbar/navbar';
 export class Favorites {
   userId!: number;
 
-  favoriteItems: FavoriteItem[] = [];
-  cartItems: CartItem[] = [];
+  favoriteItems: FavoriteItemWithDetails[] = [];
 
   constructor(
     private favoriteItemService: FavoriteItemService,
-    private cartItemService: CartItemService
+    private bookService: BookService,
+    private authorService: AuthorService
   ) {}
 
   ngOnInit(): void {
@@ -36,92 +48,94 @@ export class Favorites {
 
     this.userId = Number(userIdStr);
 
-    // Load automatically instead of using Observable to make it easier to remove from favorites
-    this.favoriteItemService.getAllByUserId(this.userId).subscribe({
-      next: (items) => {
-        this.favoriteItems = items;
-      },
-      error: (err) => console.error('Failed to load favorites:', err),
-    });
+    this.loadAuthorsIntoCache();
+    this.loadFavoriteItems(this.userId);
+  }
 
-    this.cartItemService.getAllByUserId(this.userId).subscribe({
-      next: (items) => {
-        this.cartItems = items;
+  /*==================== LOAD AUTHORS INTO CACHE ====================*/
+  loadAuthorsIntoCache(): void {
+    this.authorService.getAuthors().subscribe({
+      next: (authors) => {
+        console.log('Authors loaded into cache:', authors.length);
       },
-      error: (err) => console.error('Failed to load cart items:', err),
+      error: (err) => console.error('Failed to load authors into cache:', err),
     });
   }
 
-  removeFromFavorites(bookId: number): void {
-    const favoriteItem = this.favoriteItems.find(
-      (item) => item.bookId === bookId && item.userId === 1
-    );
+  /*==================== LOAD CART ITEMS ====================*/
+  loadFavoriteItems(userId: number): void {
+    this.favoriteItemService.getAllByUserId(userId).subscribe({
+      next: (favoriteItems) => {
+        console.log('Favorite items loaded:', favoriteItems.length);
 
-    if (!favoriteItem?.id) return;
+        // Load book for each favoriteItem
+        favoriteItems.forEach((favoriteItem) => {
+          this.bookService.getBookById(favoriteItem.bookId).subscribe({
+            next: (book) => {
+              console.log('Book loaded:', book.title);
 
-    this.favoriteItemService.deleteFavoriteItem(favoriteItem.id).subscribe({
+              // Load author for this book (from cache)
+              this.authorService
+                .getAuthorById(Number(book.authorId))
+                .subscribe({
+                  next: (author) => {
+                    if (favoriteItem.id && author) {
+                      console.log('Author loaded:', author.name);
+
+                      const item: FavoriteItemWithDetails = {
+                        id: favoriteItem.id,
+                        userId: this.userId,
+                        bookId: book.id,
+                        bookTitle: book.title,
+                        authorName: author.name,
+                        price: book.price,
+                        coverImageUrl: book.coverImageUrl,
+                      };
+
+                      this.favoriteItems.push(item);
+                    } else {
+                      console.error('Missing favorite item id or author data', {
+                        cartItemId: favoriteItem.id,
+                        author: author,
+                      });
+                    }
+                  },
+                  error: (err) => console.error('Failed to fetch author:', err),
+                });
+            },
+            error: (err) => console.error('Failed to fetch book:', err),
+          });
+        });
+      },
+      error: (err) => console.error('Failed to load favorite items:', err),
+    });
+  }
+
+  removeFromFavorites(favoriteItemId: number): void {
+    this.favoriteItemService.deleteFavoriteItem(favoriteItemId).subscribe({
       next: () => {
         this.favoriteItems = this.favoriteItems.filter(
-          (item) => item.id !== favoriteItem.id
+          (item) => item.id !== favoriteItemId
         );
+
         console.log('Removed from favorites');
       },
-      error: (err) => console.error('Failed to remove favorite:', err),
+      error: (err) => console.error('Failed to remove from favorites:', err),
     });
   }
 
-  addToCart(bookId: number): void {
-    // Check if item already exists in cart
-    const existingCartItem = this.cartItems.find(
-      (item) => item.bookId === bookId
-    );
-
-    if (existingCartItem) {
-      // Item exists, increment quantity
-      this.updateCartQuantity(
-        existingCartItem.id!,
-        existingCartItem.quantity + 1
+  // Fully AI generated function
+  getOptimizedImageUrl(originalUrl: string): string {
+    // Check if it's a Cloudinary URL
+    if (originalUrl && originalUrl.includes('cloudinary.com')) {
+      // Insert transformation parameters to resize to 256x390 (2x the display size for retina)
+      return originalUrl.replace(
+        '/upload/',
+        '/upload/w_256,h_390,c_fill,f_auto,q_auto/'
       );
-    } else {
-      // Item doesn't exist, add new item
-      this.createNewCartItem(bookId);
     }
-  }
 
-  private createNewCartItem(bookId: number): void {
-    const cartItem: CartItem = {
-      bookId: bookId,
-      userId: this.userId,
-      quantity: 1,
-    };
-
-    this.cartItemService.createCartItem(cartItem).subscribe({
-      next: (newCartItem) => {
-        this.cartItems = [...this.cartItems, newCartItem];
-        console.log('Book added to cart');
-      },
-      error: (err) => console.error('Failed to add to cart:', err),
-    });
-  }
-
-  private updateCartQuantity(cartItemId: number, newQuantity: number): void {
-    const existingItem = this.cartItems.find((item) => item.id === cartItemId);
-
-    if (!existingItem) return;
-
-    const updatedCartItem: CartItem = {
-      ...existingItem,
-      quantity: newQuantity,
-    };
-
-    this.cartItemService.updateCartItem(cartItemId, updatedCartItem).subscribe({
-      next: (updatedItem) => {
-        this.cartItems = this.cartItems.map((item) =>
-          item.id === cartItemId ? { ...item, quantity: newQuantity } : item
-        );
-        console.log(`Cart quantity updated to ${newQuantity}`);
-      },
-      error: (err) => console.error('Failed to update cart quantity:', err),
-    });
+    // Return original URL for local images
+    return originalUrl;
   }
 }
