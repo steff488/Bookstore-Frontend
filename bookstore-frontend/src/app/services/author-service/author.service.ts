@@ -23,7 +23,7 @@ export class AuthorService {
   getAuthors(): Observable<Author[]> {
     // Return cached authors if possible
     if (this.authorBehaviorSubject.value.length > 0) {
-      return of(this.authorBehaviorSubject.value);
+      return this.authorBehaviorSubject;
     }
     // Otherwise, fetch from API and cache
     return this.http
