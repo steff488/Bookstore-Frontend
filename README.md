@@ -1,8 +1,52 @@
-# BookstoreFrontend
+<h1 align="center">Welcome to The Cozy Corner</h1>
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.3.
+This project was generated using [Angular](https://angular.io) version 20.0.3.
 
-## Development server
+<p>
+</p>
+
+> Frontend for a cozy online bookstore built with Angular. It provides a user-friendly interface where you can explore books, search for specific titles, and narrow-down your choices using filters and sorting options. The interface allows you to keep track of your favorites, manage your cart and review your past orders. The aim is to create a friendly and welcoming experience that feels just like your favorite local bookstore - just online.
+
+## Backend
+
+The backend for **The Cozy Corner** is in a separate repository.<br>
+You can find it here: [Cozy Corner Backend](https://github.com/steefy02/Bookstore-Backend)
+Make sure to set up and run the backend first, then follow the the instructions below to start the user interface.
+
+## Prerequisites
+
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (version 20+ recommended)
+- [Angular CLI](https://angular.io/cli) (version 20.0.3)
+
+## Instalation
+
+1. Clone the repository:
+
+```sh
+git clone https://github.com/steefy02/Bookstore-Frontend.git
+```
+
+2. Install dependencies:
+
+```sh
+cd Bookstore-Frontend
+npm install
+```
+
+## Configuration
+
+The frontend communicates with the backend REST API. Make sure the backend server is running (default: `http://localhost:8080`).<br>
+You can configure the API base URL in the `src/environments/environment.ts` file if needed:
+
+```sh
+export const environment = {
+  apiUrl: 'http://localhost:8080'
+};
+```
+
+## Getting Started
 
 To start a local development server, run:
 
@@ -10,50 +54,5 @@ To start a local development server, run:
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Once the server is running, open your browser and navigate to `http://localhost:4200/`.<br>
+The app will automatically reload every time you change any of the source files.
