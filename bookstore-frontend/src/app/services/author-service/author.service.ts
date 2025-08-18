@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Author } from '../../models/author';
@@ -7,7 +8,7 @@ import { Author } from '../../models/author';
   providedIn: 'root',
 })
 export class AuthorService {
-  private apiUrl = 'http://localhost:8080/api/authors';
+  private apiUrl = `${environment.apiUrl}/api/authors`;
 
   private authorBehaviorSubject = new BehaviorSubject<Author[]>([]);
   authors = this.authorBehaviorSubject.asObservable();
